@@ -46,12 +46,12 @@ export function PreviewBoard({ className = '' }: PreviewBoardProps) {
 
   return (
     <div className={`relative ${className}`}>
-      {/* Board frame with "Digital Plastic" aesthetic */}
+      {/* Board frame with "Digital Plastic" aesthetic - strong shadow for anchoring */}
       <div
         className="bg-gradient-to-b from-blue-500 to-blue-600 p-2 sm:p-3 rounded-2xl sm:rounded-3xl"
         style={{
           boxShadow:
-            '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
+            '0 30px 60px -15px rgba(0, 0, 0, 0.35), 0 15px 30px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
         }}
       >
         {/* Inner board with subtle glow */}
@@ -105,9 +105,9 @@ export function PreviewBoard({ className = '' }: PreviewBoardProps) {
         </div>
       </div>
 
-      {/* Subtle ambient glow behind the board */}
+      {/* Subtle ambient glow behind the board - with breathing animation */}
       <div
-        className="absolute inset-0 -z-10 blur-3xl opacity-30"
+        className="absolute inset-0 -z-10 blur-3xl animate-pulse-slow"
         style={{
           background:
             'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.5) 0%, transparent 70%)',

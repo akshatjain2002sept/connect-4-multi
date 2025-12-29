@@ -110,35 +110,32 @@ export function HomePage() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-3 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-slate-400 text-sm">Loading...</span>
+          <div className="w-10 h-10 border-3 border-white border-t-transparent rounded-full animate-spin" />
+          <span className="text-white/70 text-sm">Loading...</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
-      {/* Minimal Header */}
-      <header className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-          Connect 4
-        </h1>
+    <div className="h-screen bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 flex flex-col overflow-hidden">
+      {/* Minimal Header - Sign out only */}
+      <header className="flex-shrink-0 flex items-center justify-end px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center gap-3">
           {profile && (
             <Link
               to="/history"
-              className="text-slate-400 hover:text-white transition-colors text-sm hidden sm:flex items-center gap-1.5"
+              className="text-white/70 hover:text-white transition-colors text-sm hidden sm:flex items-center gap-1.5"
             >
               <span className="font-medium">{profile.rating}</span>
-              <span className="text-slate-500">rating</span>
+              <span className="text-white/50">rating</span>
             </Link>
           )}
           <button
             onClick={signOut}
-            className="text-slate-400 hover:text-white transition-colors p-2 -m-2"
+            className="text-white/70 hover:text-white transition-colors p-2 -m-2"
             title="Sign out"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,17 +152,23 @@ export function HomePage() {
 
       {/* Main Content - Board + CTAs */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
-        {/* Game Board - The Visual Centerpiece */}
-        <div className="w-full max-w-md sm:max-w-lg flex-shrink-0 mb-6 sm:mb-8">
+        {/* Title - Centered, stronger weight */}
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6 sm:mb-8 tracking-tight text-center drop-shadow-lg">
+          Connect 4
+        </h1>
+
+        {/* Game Board - The Visual Centerpiece (slightly smaller, stronger shadow) */}
+        <div className="w-full max-w-sm sm:max-w-md flex-shrink-0 mb-8 sm:mb-10">
           <PreviewBoard className="w-full" />
         </div>
 
         {/* Action Buttons */}
         <div className="w-full max-w-xs sm:max-w-sm space-y-3">
-          {/* Primary CTA: New Game */}
+          {/* Primary CTA: New Game - tactile, game-like */}
           <button
             onClick={() => setShowMatchmaking(true)}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold py-4 px-6 rounded-2xl hover:from-emerald-400 hover:to-emerald-500 transition-all duration-200 text-lg shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-b from-white to-gray-100 text-blue-700 font-bold py-4 px-6 rounded-2xl hover:from-gray-50 hover:to-gray-150 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md flex items-center justify-center gap-2 border border-white/50"
+            style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -184,10 +187,10 @@ export function HomePage() {
             New Game
           </button>
 
-          {/* Secondary CTA: Play with Friend */}
+          {/* Secondary CTA: Play with Friend - flatter, less prominent */}
           <button
             onClick={openFriendModal}
-            className="w-full bg-slate-700/50 text-slate-200 font-medium py-3.5 px-6 rounded-2xl hover:bg-slate-700 transition-all duration-200 text-base border border-slate-600/50 hover:border-slate-500/50 active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full bg-white/10 text-white/80 font-medium py-3 px-6 rounded-xl hover:bg-white/20 hover:text-white transition-all duration-200 text-sm active:translate-y-0.5 flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -205,20 +208,20 @@ export function HomePage() {
         {profile && (
           <div className="mt-6 flex items-center gap-6 text-sm">
             <div className="flex items-center gap-1.5">
-              <span className="text-emerald-400 font-semibold">{profile.wins}</span>
-              <span className="text-slate-500">W</span>
+              <span className="text-green-300 font-semibold">{profile.wins}</span>
+              <span className="text-white/50">W</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-red-400 font-semibold">{profile.losses}</span>
-              <span className="text-slate-500">L</span>
+              <span className="text-red-300 font-semibold">{profile.losses}</span>
+              <span className="text-white/50">L</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-400 font-semibold">{profile.draws}</span>
-              <span className="text-slate-500">D</span>
+              <span className="text-white/70 font-semibold">{profile.draws}</span>
+              <span className="text-white/50">D</span>
             </div>
             <Link
               to="/history"
-              className="text-slate-500 hover:text-slate-300 transition-colors ml-2"
+              className="text-white/50 hover:text-white transition-colors ml-2"
             >
               View history
             </Link>
@@ -235,10 +238,10 @@ export function HomePage() {
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
           onClick={(e) => e.target === e.currentTarget && closeFriendModal()}
         >
-          <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in border border-slate-700/50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in">
             {friendModalMode === 'choose' && (
               <>
-                <h3 className="text-xl font-semibold text-white mb-6 text-center">
+                <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
                   Play with Friend
                 </h3>
                 <div className="space-y-3">
@@ -248,7 +251,7 @@ export function HomePage() {
                       handleCreatePrivateGame()
                     }}
                     disabled={creatingGame}
-                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-4 px-4 rounded-xl hover:from-blue-400 hover:to-blue-500 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full bg-blue-500 text-white font-medium py-4 px-4 rounded-xl hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -262,7 +265,7 @@ export function HomePage() {
                   </button>
                   <button
                     onClick={() => setFriendModalMode('join')}
-                    className="w-full bg-slate-700/50 text-slate-200 font-medium py-4 px-4 rounded-xl hover:bg-slate-700 transition-all duration-200 border border-slate-600/50 flex items-center justify-center gap-2"
+                    className="w-full bg-gray-100 text-gray-700 font-medium py-4 px-4 rounded-xl hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -277,7 +280,7 @@ export function HomePage() {
                 </div>
                 <button
                   onClick={closeFriendModal}
-                  className="w-full mt-4 text-slate-500 hover:text-slate-300 text-sm py-2 transition-colors"
+                  className="w-full mt-4 text-gray-400 hover:text-gray-600 text-sm py-2 transition-colors"
                 >
                   Cancel
                 </button>
@@ -288,7 +291,7 @@ export function HomePage() {
               <>
                 <button
                   onClick={() => setFriendModalMode('choose')}
-                  className="text-slate-500 hover:text-white transition-colors mb-4 flex items-center gap-1 text-sm"
+                  className="text-gray-400 hover:text-gray-600 transition-colors mb-4 flex items-center gap-1 text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -300,7 +303,7 @@ export function HomePage() {
                   </svg>
                   Back
                 </button>
-                <h3 className="text-xl font-semibold text-white mb-4 text-center">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
                   Enter Game Code
                 </h3>
                 <input
@@ -313,15 +316,15 @@ export function HomePage() {
                   placeholder="XXXXXX"
                   maxLength={6}
                   autoFocus
-                  className="w-full px-4 py-4 text-center text-2xl font-mono tracking-[0.3em] bg-slate-900/50 border border-slate-600 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-white placeholder-slate-600 mb-4"
+                  className="w-full px-4 py-4 text-center text-2xl font-mono tracking-[0.3em] bg-gray-50 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-gray-800 placeholder-gray-400 mb-4"
                 />
                 {joinError && (
-                  <p className="text-red-400 text-sm text-center mb-4">{joinError}</p>
+                  <p className="text-red-500 text-sm text-center mb-4">{joinError}</p>
                 )}
                 <button
                   onClick={handleJoinGame}
                   disabled={joiningGame || joinCode.length !== 6}
-                  className="w-full py-4 px-4 rounded-xl font-medium bg-blue-500 hover:bg-blue-400 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-4 px-4 rounded-xl font-medium bg-blue-500 hover:bg-blue-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {joiningGame ? 'Joining...' : 'Join Game'}
                 </button>

@@ -15,17 +15,17 @@ export function LoginPage() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="h-screen bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-3 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-slate-400 text-sm">Loading...</span>
+          <div className="w-10 h-10 border-3 border-white border-t-transparent rounded-full animate-spin" />
+          <span className="text-white/70 text-sm">Loading...</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 flex flex-col overflow-hidden">
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
         {/* Title */}
@@ -46,18 +46,19 @@ export function LoginPage() {
             </div>
           )}
 
-          {/* Play as Guest - Primary */}
+          {/* Play as Guest - Primary CTA with tactile press */}
           <button
             onClick={signInAsGuest}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold py-4 px-6 rounded-2xl hover:from-emerald-400 hover:to-emerald-500 transition-all duration-200 text-lg shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98]"
+            className="w-full bg-gradient-to-b from-white to-gray-100 text-blue-700 font-bold py-4 px-6 rounded-2xl hover:from-gray-50 hover:to-gray-150 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md border border-white/50"
+            style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)' }}
           >
             Play Now
           </button>
 
-          {/* Sign in with Google - Secondary */}
+          {/* Sign in with Google - Secondary, de-emphasized */}
           <button
             onClick={signInWithGoogle}
-            className="w-full bg-slate-700/50 text-slate-200 font-medium py-3.5 px-6 rounded-2xl hover:bg-slate-700 transition-all duration-200 text-base border border-slate-600/50 hover:border-slate-500/50 active:scale-[0.98] flex items-center justify-center gap-3"
+            className="w-full bg-white/10 text-white/80 font-medium py-3 px-6 rounded-xl hover:bg-white/20 hover:text-white transition-all duration-200 text-sm active:translate-y-0.5 flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -82,7 +83,7 @@ export function LoginPage() {
         </div>
 
         {/* Subtle note */}
-        <p className="text-xs text-slate-500 text-center mt-6 max-w-xs">
+        <p className="text-xs text-white/50 text-center mt-6 max-w-xs">
           Guest progress is saved in this browser only
         </p>
       </main>

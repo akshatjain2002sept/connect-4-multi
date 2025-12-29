@@ -28,6 +28,7 @@ export default {
         'drop': 'drop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'bounce-in': 'bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'pulse-glow': 'pulseGlow 1.5s ease-in-out infinite',
+        'pulse-slow': 'pulseSlow 4s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'spin-slow': 'spin 3s linear infinite',
         'wiggle': 'wiggle 0.3s ease-in-out',
@@ -75,6 +76,10 @@ export default {
         scaleIn: {
           '0%': { transform: 'scale(0.9)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        pulseSlow: {
+          '0%, 100%': { opacity: '0.25' },
+          '50%': { opacity: '0.4' },
         },
       },
       boxShadow: {
