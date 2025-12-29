@@ -71,10 +71,10 @@ export function GameOverModal({
     rematchRequested && game.rematchRequestedBy !== myPlayerNumber
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
         <div className="text-center mb-6">
-          <h2 className={`text-4xl font-bold ${color} mb-2`}>{title}</h2>
+          <h2 className={`text-4xl font-bold ${color} mb-2 animate-bounce-in`}>{title}</h2>
           {subtitle && <p className="text-gray-500">{subtitle}</p>}
         </div>
 

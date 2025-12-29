@@ -166,24 +166,24 @@ export function GamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 py-4 sm:py-8 px-2 sm:px-4">
       <div className="container mx-auto max-w-lg">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 text-white">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-red-500" />
-            <span className="font-medium">
+        <div className="flex justify-between items-center mb-4 sm:mb-6 text-white px-1">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 flex-shrink-0" />
+            <span className="font-medium text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">
               {game.player1?.username || 'Player 1'}
               {playerInfo?.playerNumber === 1 && ' (You)'}
             </span>
           </div>
-          <div className="text-sm opacity-75">vs</div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">
+          <div className="text-xs sm:text-sm opacity-75 flex-shrink-0 px-2">vs</div>
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="font-medium text-sm sm:text-base truncate max-w-[80px] sm:max-w-none text-right">
               {game.player2?.username || 'Player 2'}
               {playerInfo?.playerNumber === 2 && ' (You)'}
             </span>
-            <div className="w-4 h-4 rounded-full bg-yellow-400" />
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-yellow-400 flex-shrink-0" />
           </div>
         </div>
 

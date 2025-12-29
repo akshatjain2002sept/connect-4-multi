@@ -85,15 +85,15 @@ export function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-center mb-4 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               to="/"
-              className="text-white hover:text-white/80 transition"
+              className="text-white hover:text-white/80 transition p-1"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -102,18 +102,18 @@ export function HistoryPage() {
                 />
               </svg>
             </Link>
-            <h1 className="text-3xl font-bold text-white">Match History</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-white">Match History</h1>
           </div>
           <button
             onClick={signOut}
-            className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition"
+            className="bg-white/20 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/30 transition text-sm sm:text-base"
           >
             Sign Out
           </button>
         </div>
 
         {/* Games List */}
-        <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-3xl mx-auto">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6 max-w-3xl mx-auto">
           {loading ? (
             <div className="text-center py-12 text-gray-500">Loading...</div>
           ) : games.length === 0 ? (
@@ -129,34 +129,34 @@ export function HistoryPage() {
             </div>
           ) : (
             <>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {games.map((game) => {
                   const ratingChange = getRatingChange(game, user?.uid)
 
                   return (
                     <div
                       key={game.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition"
+                      className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition gap-2"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                         {getResultBadge(game, user?.uid)}
-                        <div>
-                          <div className="font-medium text-gray-800">
+                        <div className="min-w-0">
+                          <div className="font-medium text-gray-800 text-sm sm:text-base truncate">
                             vs{' '}
                             {game.player1?.firebaseUid === user?.uid
                               ? game.player2?.username || 'Unknown'
                               : game.player1?.username || 'Unknown'}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-xs sm:text-sm text-gray-500">
                             {formatDate(game.completedAt || game.updatedAt)}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                         {ratingChange !== null && (
                           <div
-                            className={`font-semibold ${
+                            className={`font-semibold text-sm sm:text-base ${
                               ratingChange > 0
                                 ? 'text-green-600'
                                 : ratingChange < 0
@@ -169,7 +169,7 @@ export function HistoryPage() {
                           </div>
                         )}
                         {game.endedReason === 'ABANDONED' && (
-                          <span className="text-xs text-yellow-600">Abandoned</span>
+                          <span className="text-xs text-yellow-600 hidden sm:inline">Abandoned</span>
                         )}
                       </div>
                     </div>
@@ -179,21 +179,21 @@ export function HistoryPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="flex justify-center items-center gap-2 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
                   <button
                     onClick={() => setOffset(Math.max(0, offset - GAMES_PER_PAGE))}
                     disabled={offset === 0}
-                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm sm:text-base min-h-[44px] min-w-[44px]"
                   >
-                    Previous
+                    Prev
                   </button>
-                  <span className="text-gray-600">
-                    Page {currentPage} of {totalPages}
+                  <span className="text-gray-600 text-sm sm:text-base">
+                    {currentPage}/{totalPages}
                   </span>
                   <button
                     onClick={() => setOffset(offset + GAMES_PER_PAGE)}
                     disabled={currentPage >= totalPages}
-                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm sm:text-base min-h-[44px] min-w-[44px]"
                   >
                     Next
                   </button>

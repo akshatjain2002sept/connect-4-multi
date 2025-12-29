@@ -21,9 +21,10 @@ export function ClaimWinButton({ game, myUserId, onClaim, loading }: ClaimWinBut
       onClick={onClaim}
       disabled={loading}
       className={`
-        bg-yellow-500 px-6 py-3 rounded-xl font-bold text-white
-        shadow-lg hover:bg-yellow-400 transition-all
-        animate-pulse hover:animate-none
+        bg-gradient-to-r from-yellow-400 to-yellow-500 px-6 py-3 rounded-xl font-bold text-white
+        shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/40
+        hover:from-yellow-300 hover:to-yellow-400 transition-all duration-200
+        animate-pulse-glow hover:animate-wiggle
         disabled:opacity-50 disabled:cursor-not-allowed
         flex items-center gap-2
       `}

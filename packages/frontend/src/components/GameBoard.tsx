@@ -45,13 +45,13 @@ export function GameBoard({
   }
 
   return (
-    <div className="relative">
-      {/* Column hover indicators */}
-      <div className="flex justify-center mb-2">
+    <div className="relative w-full max-w-[min(100%,400px)] mx-auto">
+      {/* Column hover indicators - hidden on touch devices */}
+      <div className="hidden sm:flex justify-center mb-2">
         {Array.from({ length: BOARD_COLS }).map((_, col) => (
           <div
             key={col}
-            className={`w-12 h-8 sm:w-14 sm:h-10 flex items-center justify-center transition-opacity ${
+            className={`w-12 h-10 md:w-14 md:h-12 flex items-center justify-center transition-opacity ${
               isMyTurn && canDropInColumn(col) && !disabled
                 ? 'opacity-100 cursor-pointer'
                 : 'opacity-0'
@@ -59,7 +59,7 @@ export function GameBoard({
             onClick={() => handleColumnClick(col)}
           >
             <div
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${
                 myPlayerNumber === 1
                   ? 'bg-red-400/50'
                   : myPlayerNumber === 2
@@ -73,14 +73,14 @@ export function GameBoard({
 
       {/* Game board - "Digital Plastic" aesthetic */}
       <div
-        className="bg-gradient-to-b from-blue-600 to-blue-700 p-3 sm:p-4 rounded-2xl shadow-2xl"
+        className="bg-gradient-to-b from-blue-600 to-blue-700 p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl shadow-2xl"
         style={{
           boxShadow:
             '0 20px 40px rgba(0, 0, 0, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.2)',
         }}
       >
         <div
-          className="grid gap-1 sm:gap-2"
+          className="grid gap-1 sm:gap-1.5 md:gap-2"
           style={{
             gridTemplateColumns: `repeat(${BOARD_COLS}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${BOARD_ROWS}, minmax(0, 1fr))`,
@@ -97,10 +97,10 @@ export function GameBoard({
                 <button
                   key={`${row}-${col}`}
                   className={`
-                    w-10 h-10 sm:w-12 sm:h-12 rounded-full
+                    aspect-square w-full min-w-[44px] max-w-[52px] rounded-full
                     flex items-center justify-center
-                    transition-all duration-150
-                    ${canDrop ? 'cursor-pointer hover:scale-105' : 'cursor-default'}
+                    transition-all duration-150 touch-manipulation
+                    ${canDrop ? 'cursor-pointer hover:scale-105 active:scale-95' : 'cursor-default'}
                   `}
                   style={{
                     background:
@@ -113,10 +113,11 @@ export function GameBoard({
                   {cellValue !== '0' && (
                     <div
                       className={`
-                        w-8 h-8 sm:w-10 sm:h-10 rounded-full
+                        w-[85%] h-[85%] rounded-full
                         transition-all duration-200
-                        ${isWinning ? 'animate-pulse ring-4 ring-white ring-opacity-75' : ''}
-                        ${isLast ? 'ring-2 ring-white ring-opacity-50' : ''}
+                        ${isLast ? 'animate-drop' : ''}
+                        ${isWinning ? 'animate-pulse-glow ring-4 ring-white ring-opacity-75' : ''}
+                        ${isLast && !isWinning ? 'ring-2 ring-white ring-opacity-50' : ''}
                       `}
                       style={
                         cellValue === '1'

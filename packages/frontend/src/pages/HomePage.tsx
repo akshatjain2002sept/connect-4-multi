@@ -106,17 +106,17 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Connect 4</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-white">
+        <div className="flex justify-between items-center mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Connect 4</h1>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="text-white text-sm sm:text-base truncate max-w-[100px] sm:max-w-none">
               {profile?.username || (user?.isAnonymous ? 'Guest' : user?.displayName)}
             </span>
             <button
               onClick={signOut}
-              className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition"
+              className="bg-white/20 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/30 transition text-sm sm:text-base min-h-[44px]"
             >
               Sign Out
             </button>
@@ -124,13 +124,13 @@ export function HomePage() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl mx-auto">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 max-w-2xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Play Connect 4</h2>
 
           <div className="space-y-4">
             <button
               onClick={() => setShowMatchmaking(true)}
-              className="w-full bg-blue-500 text-white font-semibold py-4 px-6 rounded-xl hover:bg-blue-600 transition text-lg flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -146,7 +146,7 @@ export function HomePage() {
             <button
               onClick={handleCreatePrivateGame}
               disabled={creatingGame}
-              className="w-full bg-green-500 text-white font-semibold py-4 px-6 rounded-xl hover:bg-green-600 transition text-lg flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 text-lg flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -161,7 +161,7 @@ export function HomePage() {
 
             <button
               onClick={() => setShowJoinModal(true)}
-              className="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-xl hover:bg-purple-600 transition text-lg flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -177,29 +177,29 @@ export function HomePage() {
 
           {/* Stats */}
           {profile && (
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Stats</h3>
-              <div className="grid grid-cols-4 gap-4 text-center">
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Your Stats</h3>
+              <div className="grid grid-cols-4 gap-2 sm:gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">{profile.rating}</div>
-                  <div className="text-sm text-gray-500">Rating</div>
+                  <div className="text-lg sm:text-2xl font-bold text-gray-800">{profile.rating}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Rating</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-600">{profile.wins}</div>
-                  <div className="text-sm text-gray-500">Wins</div>
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">{profile.wins}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Wins</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-red-600">{profile.losses}</div>
-                  <div className="text-sm text-gray-500">Losses</div>
+                  <div className="text-lg sm:text-2xl font-bold text-red-600">{profile.losses}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Losses</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-600">{profile.draws}</div>
-                  <div className="text-sm text-gray-500">Draws</div>
+                  <div className="text-lg sm:text-2xl font-bold text-gray-600">{profile.draws}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Draws</div>
                 </div>
               </div>
               <Link
                 to="/history"
-                className="block mt-4 text-center text-blue-500 hover:text-blue-600 font-medium"
+                className="block mt-4 text-center text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center"
               >
                 View Match History →
               </Link>
@@ -213,8 +213,8 @@ export function HomePage() {
 
       {/* Join Game Modal */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Join Game</h3>
             <input
               type="text"
