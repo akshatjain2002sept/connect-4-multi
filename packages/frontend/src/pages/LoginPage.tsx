@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContext'
 import { useEffect } from 'react'
+import { PreviewBoard } from '../components/PreviewBoard'
 
 export function LoginPage() {
   const { user, loading, signInWithGoogle, signInAsGuest, error } = useAuthContext()
@@ -14,32 +15,49 @@ export function LoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-blue-700">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-3 border-blue-400 border-t-transparent rounded-full animate-spin" />
+          <span className="text-slate-400 text-sm">Loading...</span>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-blue-700 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-slide-up">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 mb-2 animate-bounce-in">
-            Connect 4
-          </h1>
-          <p className="text-gray-500 animate-fade-in">Multiplayer</p>
+    <div className="h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
+        {/* Title */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6 sm:mb-8 tracking-tight animate-fade-in">
+          Connect 4
+        </h1>
+
+        {/* Preview Board */}
+        <div className="w-full max-w-sm sm:max-w-md flex-shrink-0 mb-8 sm:mb-10 animate-slide-up">
+          <PreviewBoard className="w-full opacity-80" />
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 animate-wiggle">
-            {error.message}
-          </div>
-        )}
+        {/* Auth Buttons */}
+        <div className="w-full max-w-xs space-y-3 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm text-center mb-4">
+              {error.message}
+            </div>
+          )}
 
-        <div className="space-y-4">
+          {/* Play as Guest - Primary */}
+          <button
+            onClick={signInAsGuest}
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold py-4 px-6 rounded-2xl hover:from-emerald-400 hover:to-emerald-500 transition-all duration-200 text-lg shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98]"
+          >
+            Play Now
+          </button>
+
+          {/* Sign in with Google - Secondary */}
           <button
             onClick={signInWithGoogle}
-            className="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+            className="w-full bg-slate-700/50 text-slate-200 font-medium py-3.5 px-6 rounded-2xl hover:bg-slate-700 transition-all duration-200 text-base border border-slate-600/50 hover:border-slate-500/50 active:scale-[0.98] flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -61,20 +79,13 @@ export function LoginPage() {
             </svg>
             Sign in with Google
           </button>
-
-          <button
-            onClick={signInAsGuest}
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Play as Guest
-          </button>
         </div>
 
-        <p className="text-xs text-gray-400 text-center mt-6">
-          Guest accounts are stored in this browser only. Clearing browser data will lose your
-          account and history.
+        {/* Subtle note */}
+        <p className="text-xs text-slate-500 text-center mt-6 max-w-xs">
+          Guest progress is saved in this browser only
         </p>
-      </div>
+      </main>
     </div>
   )
 }

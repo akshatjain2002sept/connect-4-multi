@@ -82,29 +82,56 @@ export function MatchmakingModal({ onClose }: MatchmakingModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in">
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+      onClick={(e) => e.target === e.currentTarget && status !== 'joining' && handleCancel()}
+    >
+      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-8 animate-scale-in border border-slate-700/50">
         {status === 'joining' && (
           <div className="text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-800">Joining Queue...</h3>
+            <div className="w-12 h-12 border-3 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+            <h3 className="text-xl font-semibold text-white">Joining Queue</h3>
           </div>
         )}
 
         {status === 'queued' && (
           <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-4">
-              <div className="absolute inset-0 border-4 border-blue-200 rounded-full" />
-              <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            {/* Animated timer ring */}
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="44"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  className="text-slate-700"
+                />
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="44"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeLinecap="round"
+                  className="text-emerald-400 animate-pulse"
+                  strokeDasharray="276.46"
+                  strokeDashoffset="69"
+                />
+              </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-bold text-blue-600">{formatTime(elapsedTime)}</span>
+                <span className="text-2xl font-mono font-semibold text-white">
+                  {formatTime(elapsedTime)}
+                </span>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Finding Opponent...</h3>
-            <p className="text-gray-500 mb-6">Searching for a match</p>
+            <h3 className="text-xl font-semibold text-white mb-1">Finding Opponent</h3>
+            <p className="text-slate-400 text-sm mb-8">Searching for a match...</p>
             <button
               onClick={handleCancel}
-              className="w-full py-3 px-4 rounded-xl font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+              className="w-full py-3 px-4 rounded-xl font-medium bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition-all border border-slate-600/50"
             >
               Cancel
             </button>
@@ -112,21 +139,29 @@ export function MatchmakingModal({ onClose }: MatchmakingModalProps) {
         )}
 
         {status === 'matched' && (
-          <div className="text-center">
-            <div className="text-4xl mb-4">🎮</div>
-            <h3 className="text-xl font-bold text-green-600">Match Found!</h3>
-            <p className="text-gray-500">Redirecting to game...</p>
+          <div className="text-center py-4">
+            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-emerald-400 mb-1">Match Found!</h3>
+            <p className="text-slate-400 text-sm">Starting game...</p>
           </div>
         )}
 
         {status === 'error' && (
           <div className="text-center">
-            <div className="text-4xl mb-4">❌</div>
-            <h3 className="text-xl font-bold text-red-600 mb-2">Error</h3>
-            <p className="text-gray-500 mb-6">{error}</p>
+            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-red-400 mb-1">Error</h3>
+            <p className="text-slate-400 text-sm mb-6">{error}</p>
             <button
               onClick={onClose}
-              className="w-full py-3 px-4 rounded-xl font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+              className="w-full py-3 px-4 rounded-xl font-medium bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition-all border border-slate-600/50"
             >
               Close
             </button>
