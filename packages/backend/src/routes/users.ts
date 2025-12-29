@@ -78,22 +78,31 @@ router.get('/me', authMiddleware, async (req, res: Response, next) => {
 
 /**
  * PUT /api/users/me
- * Update current user profile (username only for now)
+ * Update current user profile (upserts - creates if not exists)
  */
 router.put('/me', authMiddleware, async (req, res: Response, next) => {
   try {
-    const { uid } = (req as AuthenticatedRequest).user
+    const { uid, email, isAnonymous } = (req as AuthenticatedRequest).user
     const { username } = req.body
 
     let user = await prisma.user.findUnique({
       where: { firebaseUid: uid }
     })
 
+    // Upsert: create user if doesn't exist
     if (!user) {
-      throw new ApiError('USER_NOT_FOUND')
+      const defaultUsername = await generateUniqueUsername()
+      user = await prisma.user.create({
+        data: {
+          firebaseUid: uid,
+          email: email || null,
+          username: defaultUsername,
+          isGuest: isAnonymous,
+        }
+      })
     }
 
-    // Validate username if provided
+    // Validate and update username if provided
     if (username !== undefined) {
       if (typeof username !== 'string') {
         throw new ApiError('INVALID_USERNAME', 'Username must be a string')

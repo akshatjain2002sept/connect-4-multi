@@ -1,4 +1,5 @@
 import { Router, Response } from 'express'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/db.js'
 import { authMiddleware, AuthenticatedRequest } from '../middleware/auth.js'
 import { ApiError } from '../lib/errors.js'
@@ -352,7 +353,7 @@ router.post('/:id/move', authMiddleware, async (req, res: Response, next) => {
           },
           data: {
             board: newBoard,
-            moves: newMoves,
+            moves: newMoves as unknown as Prisma.InputJsonValue,
             status: 'COMPLETED',
             result: gameResult,
             endedReason: reason,
@@ -412,7 +413,7 @@ router.post('/:id/move', authMiddleware, async (req, res: Response, next) => {
         },
         data: {
           board: newBoard,
-          moves: newMoves,
+          moves: newMoves as unknown as Prisma.InputJsonValue,
           currentTurn: nextTurn,
           ...(isPlayer1 ? { player1LastSeen: new Date() } : { player2LastSeen: new Date() })
         }
@@ -608,6 +609,17 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
       }
 
       // ACCEPT REMATCH - other player requested, this is acceptance
+
+      // Check neither player has another active game (besides this completed one)
+      const [p1ActiveGame, p2ActiveGame] = await Promise.all([
+        getActiveGameForUser(tx, game.player1Id),
+        getActiveGameForUser(tx, game.player2Id!)
+      ])
+
+      if (p1ActiveGame || p2ActiveGame) {
+        throw new ApiError('HAS_ACTIVE_GAME')
+      }
+
       const [player1Data, player2Data] = await Promise.all([
         tx.user.findUnique({ where: { id: game.player1Id } }),
         tx.user.findUnique({ where: { id: game.player2Id! } })
@@ -665,11 +677,12 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
     if (result.status === 'requested') {
       res.json({ status: 'requested' })
     } else {
+      const newGame = result.newGame!
       res.json({
         status: 'accepted',
-        newGameId: result.newGame.id,
-        newPublicId: result.newGame.publicId,
-        game: formatGameResponse(result.newGame)
+        newGameId: newGame.id,
+        newPublicId: newGame.publicId,
+        game: formatGameResponse(newGame)
       })
     }
   } catch (error) {

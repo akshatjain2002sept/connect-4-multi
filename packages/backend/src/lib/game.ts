@@ -1,4 +1,5 @@
-import { PrismaClient, Prisma, Game } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
+import type { Game } from '@prisma/client'
 import { Move, BOARD_SIZE, ABANDON_THRESHOLD_MS } from '@connect4/shared'
 
 // Base32 characters (excluding I, O, 0, 1 to avoid confusion)
@@ -31,12 +32,12 @@ export function generateGameCode(): string {
  */
 export async function createGameWithPublicId(
   db: PrismaClient | Prisma.TransactionClient,
-  data: Omit<Prisma.GameCreateInput, 'publicId'>
+  data: Record<string, unknown>
 ): Promise<Game> {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       return await db.game.create({
-        data: { ...data, publicId: generatePublicId() }
+        data: { ...data, publicId: generatePublicId() } as Prisma.GameCreateInput
       })
     } catch (e: unknown) {
       const error = e as { code?: string; meta?: { target?: string[] } }
