@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer utilities {
+  /* Animations for "Digital Plastic" aesthetic */
+  .animate-in {
+    animation: animate-in 0.2s ease-out;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .zoom-in-95 {
+    --tw-enter-scale: 0.95;
+  }
+
+  /* Piece drop animation */
+  .animate-drop {
+    animation: drop 0.3s ease-out;
+  }
+
+  @keyframes drop {
+    from {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Winning piece glow */
+  .animate-win-glow {
+    animation: win-glow 1s ease-in-out infinite;
+  }
+
+  @keyframes win-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+    }
+  }
+}

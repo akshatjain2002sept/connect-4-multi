@@ -1,0 +1,23 @@
+{
+  "name": "connect-4-multi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Connect 4 Multiplayer Game",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "pnpm --parallel --filter frontend --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm --filter shared build && pnpm --parallel --filter frontend --filter backend build",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "build:shared": "pnpm --filter shared build",
+    "lint": "pnpm --parallel -r lint",
+    "typecheck": "pnpm --parallel -r typecheck"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.15.1"
+}

@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique
+  email       String?  // null for guests
+  username    String   @unique
+  isGuest     Boolean  @default(false)
+  rating      Int      @default(1000)
+  wins        Int      @default(0)
+  losses      Int      @default(0)
+  draws       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  gamesAsPlayer1 Game[] @relation("Player1")
+  gamesAsPlayer2 Game[] @relation("Player2")
+  gamesWon       Game[] @relation("Winner")
+
+  @@index([rating])
+  @@index([createdAt])
+}
+
+model Game {
+  id              String      @id @default(uuid())
+  publicId        String      @unique // 8-char base32 for URLs/display
+  code            String?     @unique // for private games, null for matchmaking
+
+  // Players
+  player1         User        @relation("Player1", fields: [player1Id], references: [id])
+  player1Id       String
+  player2         User?       @relation("Player2", fields: [player2Id], references: [id])
+  player2Id       String?
+
+  // Game state
+  board           String      @default("000000000000000000000000000000000000000000") // 42 chars
+  currentTurn     Int         @default(1) // 1 or 2
+  status          GameStatus  @default(WAITING)
+  moves           Json        @default(dbgenerated("'[]'::jsonb"))
+
+  // Result tracking
+  result          GameResult?
+  endedReason     EndReason?
+  winner          User?       @relation("Winner", fields: [winnerId], references: [id])
+  winnerId        String?
+
+  // Rating snapshots - REQUIRED when status becomes ACTIVE
+  p1RatingBefore  Int?
+  p2RatingBefore  Int?
+  p1RatingDelta   Int?
+  p2RatingDelta   Int?
+  ratingAppliedAt DateTime?
+
+  // Rematch
+  rematchRequestedBy Int?
+  rematchGameId      String?
+
+  // Heartbeat / abandonment
+  player1LastSeen DateTime?
+  player2LastSeen DateTime?
+
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  completedAt     DateTime?
+
+  @@index([player1Id, createdAt])
+  @@index([player2Id, createdAt])
+  @@index([code])
+  @@index([status])
+  @@index([updatedAt])
+  @@index([publicId])
+}
+
+enum GameStatus {
+  WAITING
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum GameResult {
+  P1_WIN
+  P2_WIN
+  DRAW
+}
+
+enum EndReason {
+  CONNECT4
+  BOARD_FULL
+  ABANDONED
+}
