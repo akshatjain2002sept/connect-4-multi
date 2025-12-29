@@ -11,10 +11,10 @@ export function HomePage() {
   const [profile, setProfile] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showMatchmaking, setShowMatchmaking] = useState(false)
+  const [showPlayModal, setShowPlayModal] = useState(false)
+  const [playModalMode, setPlayModalMode] = useState<'choose' | 'friend-choose' | 'friend-join'>('choose')
   const [joinCode, setJoinCode] = useState('')
   const [joinError, setJoinError] = useState<string | null>(null)
-  const [showFriendModal, setShowFriendModal] = useState(false)
-  const [friendModalMode, setFriendModalMode] = useState<'choose' | 'create' | 'join'>('choose')
   const [creatingGame, setCreatingGame] = useState(false)
   const [joiningGame, setJoiningGame] = useState(false)
 
@@ -94,18 +94,23 @@ export function HomePage() {
     }
   }, [joinCode, navigate])
 
-  const openFriendModal = () => {
-    setFriendModalMode('choose')
+  const openPlayModal = () => {
+    setPlayModalMode('choose')
     setJoinCode('')
     setJoinError(null)
-    setShowFriendModal(true)
+    setShowPlayModal(true)
   }
 
-  const closeFriendModal = () => {
-    setShowFriendModal(false)
-    setFriendModalMode('choose')
+  const closePlayModal = () => {
+    setShowPlayModal(false)
+    setPlayModalMode('choose')
     setJoinCode('')
     setJoinError(null)
+  }
+
+  const handlePlayOnline = () => {
+    closePlayModal()
+    setShowMatchmaking(true)
   }
 
   if (loading) {
@@ -162,11 +167,10 @@ export function HomePage() {
           <PreviewBoard className="w-full" />
         </div>
 
-        {/* Action Buttons */}
-        <div className="w-full max-w-xs sm:max-w-sm space-y-3">
-          {/* Primary CTA: New Game - tactile, game-like */}
+        {/* Action Button - Single Play Now CTA */}
+        <div className="w-full max-w-xs sm:max-w-sm">
           <button
-            onClick={() => setShowMatchmaking(true)}
+            onClick={openPlayModal}
             className="w-full bg-gradient-to-b from-white to-gray-100 text-blue-700 font-bold py-4 px-6 rounded-2xl hover:from-gray-50 hover:to-gray-150 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md flex items-center justify-center gap-2 border border-white/50"
             style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)' }}
           >
@@ -184,23 +188,7 @@ export function HomePage() {
                 d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            New Game
-          </button>
-
-          {/* Secondary CTA: Play with Friend - flatter, less prominent */}
-          <button
-            onClick={openFriendModal}
-            className="w-full bg-white/10 text-white/80 font-medium py-3 px-6 rounded-xl hover:bg-white/20 hover:text-white transition-all duration-200 text-sm active:translate-y-0.5 flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            Play with Friend
+            Play Now
           </button>
         </div>
 
@@ -232,39 +220,36 @@ export function HomePage() {
       {/* Matchmaking Modal */}
       {showMatchmaking && <MatchmakingModal onClose={() => setShowMatchmaking(false)} />}
 
-      {/* Friend Game Modal */}
-      {showFriendModal && (
+      {/* Play Mode Modal */}
+      {showPlayModal && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
-          onClick={(e) => e.target === e.currentTarget && closeFriendModal()}
+          onClick={(e) => e.target === e.currentTarget && closePlayModal()}
         >
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in">
-            {friendModalMode === 'choose' && (
+            {/* Initial choice: Play Online vs Play with Friend */}
+            {playModalMode === 'choose' && (
               <>
                 <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-                  Play with Friend
+                  How do you want to play?
                 </h3>
                 <div className="space-y-3">
                   <button
-                    onClick={() => {
-                      setFriendModalMode('create')
-                      handleCreatePrivateGame()
-                    }}
-                    disabled={creatingGame}
-                    className="w-full bg-blue-500 text-white font-medium py-4 px-4 rounded-xl hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                    onClick={handlePlayOnline}
+                    className="w-full bg-blue-500 text-white font-medium py-4 px-4 rounded-xl hover:bg-blue-600 transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 4v16m8-8H4"
+                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
                       />
                     </svg>
-                    {creatingGame ? 'Creating...' : 'Create Game'}
+                    Play Online
                   </button>
                   <button
-                    onClick={() => setFriendModalMode('join')}
+                    onClick={() => setPlayModalMode('friend-choose')}
                     className="w-full bg-gray-100 text-gray-700 font-medium py-4 px-4 rounded-xl hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,14 +257,14 @@ export function HomePage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M11 16l-4-4m0 0l4-4m-4 4h14"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    Join with Code
+                    Play with Friend
                   </button>
                 </div>
                 <button
-                  onClick={closeFriendModal}
+                  onClick={closePlayModal}
                   className="w-full mt-4 text-gray-400 hover:text-gray-600 text-sm py-2 transition-colors"
                 >
                   Cancel
@@ -287,19 +272,54 @@ export function HomePage() {
               </>
             )}
 
-            {friendModalMode === 'join' && (
+            {/* Friend game: Create or Join */}
+            {playModalMode === 'friend-choose' && (
               <>
                 <button
-                  onClick={() => setFriendModalMode('choose')}
+                  onClick={() => setPlayModalMode('choose')}
                   className="text-gray-400 hover:text-gray-600 transition-colors mb-4 flex items-center gap-1 text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+                <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+                  Play with Friend
+                </h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={handleCreatePrivateGame}
+                    disabled={creatingGame}
+                    className="w-full bg-blue-500 text-white font-medium py-4 px-4 rounded-xl hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    {creatingGame ? 'Creating...' : 'Create Game'}
+                  </button>
+                  <button
+                    onClick={() => setPlayModalMode('friend-join')}
+                    className="w-full bg-gray-100 text-gray-700 font-medium py-4 px-4 rounded-xl hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
+                    </svg>
+                    Join with Code
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* Friend game: Enter code */}
+            {playModalMode === 'friend-join' && (
+              <>
+                <button
+                  onClick={() => setPlayModalMode('friend-choose')}
+                  className="text-gray-400 hover:text-gray-600 transition-colors mb-4 flex items-center gap-1 text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   Back
                 </button>
