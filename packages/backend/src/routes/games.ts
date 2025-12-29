@@ -31,11 +31,13 @@ function formatGameResponse(game: any) {
     moves: parseMoves(game.moves),
     player1: game.player1 ? {
       id: game.player1.id,
+      firebaseUid: game.player1.firebaseUid,
       username: game.player1.username,
       rating: game.player1.rating
     } : null,
     player2: game.player2 ? {
       id: game.player2.id,
+      firebaseUid: game.player2.firebaseUid,
       username: game.player2.username,
       rating: game.player2.rating
     } : null,
@@ -95,8 +97,8 @@ router.post('/', authMiddleware, async (req, res: Response, next) => {
     const fullGame = await prisma.game.findUnique({
       where: { id: game.id },
       include: {
-        player1: { select: { id: true, username: true, rating: true } },
-        player2: { select: { id: true, username: true, rating: true } }
+        player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
       }
     })
 
@@ -168,8 +170,8 @@ router.post('/join/:code', authMiddleware, async (req, res: Response, next) => {
       const updatedGame = await tx.game.findUnique({
         where: { id: game.id },
         include: {
-          player1: { select: { id: true, username: true, rating: true } },
-          player2: { select: { id: true, username: true, rating: true } }
+          player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+          player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
         }
       })
 
@@ -202,8 +204,8 @@ router.get('/by-public/:publicId', authMiddleware, async (req, res: Response, ne
     const game = await prisma.game.findUnique({
       where: { publicId },
       include: {
-        player1: { select: { id: true, username: true, rating: true } },
-        player2: { select: { id: true, username: true, rating: true } }
+        player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
       }
     })
 
@@ -241,8 +243,8 @@ router.get('/:id', authMiddleware, async (req, res: Response, next) => {
     const game = await prisma.game.findUnique({
       where: { id },
       include: {
-        player1: { select: { id: true, username: true, rating: true } },
-        player2: { select: { id: true, username: true, rating: true } }
+        player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
       }
     })
 
@@ -393,8 +395,8 @@ router.post('/:id/move', authMiddleware, async (req, res: Response, next) => {
         const finalGame = await tx.game.findUnique({
           where: { id: gameId },
           include: {
-            player1: { select: { id: true, username: true, rating: true } },
-            player2: { select: { id: true, username: true, rating: true } }
+            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
           }
         })
 
@@ -426,8 +428,8 @@ router.post('/:id/move', authMiddleware, async (req, res: Response, next) => {
       const updatedGame = await tx.game.findUnique({
         where: { id: gameId },
         include: {
-          player1: { select: { id: true, username: true, rating: true } },
-          player2: { select: { id: true, username: true, rating: true } }
+          player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+          player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
         }
       })
 
@@ -516,8 +518,8 @@ router.post('/:id/claim-abandoned', authMiddleware, async (req, res: Response, n
         const currentGame = await tx.game.findUnique({
           where: { id: gameId },
           include: {
-            player1: { select: { id: true, username: true, rating: true } },
-            player2: { select: { id: true, username: true, rating: true } }
+            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
           }
         })
         return currentGame!
@@ -543,8 +545,8 @@ router.post('/:id/claim-abandoned', authMiddleware, async (req, res: Response, n
       const finalGame = await tx.game.findUnique({
         where: { id: gameId },
         include: {
-          player1: { select: { id: true, username: true, rating: true } },
-          player2: { select: { id: true, username: true, rating: true } }
+          player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+          player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
         }
       })
 
@@ -587,8 +589,8 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
         const rematchGame = await tx.game.findUnique({
           where: { id: game.rematchGameId },
           include: {
-            player1: { select: { id: true, username: true, rating: true } },
-            player2: { select: { id: true, username: true, rating: true } }
+            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
           }
         })
         return { status: 'accepted', newGame: rematchGame! }
@@ -656,8 +658,8 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
         const existingRematch = await tx.game.findUnique({
           where: { id: updatedOriginal!.rematchGameId! },
           include: {
-            player1: { select: { id: true, username: true, rating: true } },
-            player2: { select: { id: true, username: true, rating: true } }
+            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
           }
         })
         return { status: 'accepted', newGame: existingRematch! }
@@ -666,8 +668,8 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
       const fullNewGame = await tx.game.findUnique({
         where: { id: newGame.id },
         include: {
-          player1: { select: { id: true, username: true, rating: true } },
-          player2: { select: { id: true, username: true, rating: true } }
+          player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+          player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
         }
       })
 

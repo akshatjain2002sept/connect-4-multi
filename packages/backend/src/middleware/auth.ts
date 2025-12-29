@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import admin from 'firebase-admin'
 
-// Initialize Firebase Admin (only once)
-if (!admin.apps.length) {
+// Dev mode: skip Firebase auth and use mock user
+const DEV_MODE = process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_BYPASS === 'true'
+
+// Initialize Firebase Admin (only once, skip in dev bypass mode)
+if (!DEV_MODE && !admin.apps.length) {
   // In production, use GOOGLE_APPLICATION_CREDENTIALS env var
   // For development, initialize with project config
   const projectId = process.env.FIREBASE_PROJECT_ID
@@ -37,6 +40,22 @@ export async function authMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  // Dev bypass: accept any token as a user ID
+  if (DEV_MODE) {
+    const authHeader = req.headers.authorization
+    // In dev mode, token format is "Bearer dev-{userId}" or just "Bearer {userId}"
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : 'dev-user-1'
+    const uid = token.startsWith('dev-') ? token : `dev-${token}`
+
+    ;(req as AuthenticatedRequest).user = {
+      uid,
+      email: `${uid}@dev.local`,
+      isAnonymous: false,
+    }
+    next()
+    return
+  }
+
   const authHeader = req.headers.authorization
 
   if (!authHeader?.startsWith('Bearer ')) {

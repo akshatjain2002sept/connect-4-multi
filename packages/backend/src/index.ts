@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import { authMiddleware, AuthenticatedRequest } from './middleware/auth.js'
+import { authMiddleware } from './middleware/auth.js'
+import type { AuthenticatedRequest } from './middleware/auth.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import userRoutes from './routes/users.js'
 import gameRoutes from './routes/games.js'

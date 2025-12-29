@@ -25,11 +25,13 @@ let mockUser: MockUser | null = null
 let authStateListeners: ((user: MockUser | null) => void)[] = []
 
 function createMockUser(uid: string, email: string | null = null): MockUser {
+  // Ensure UID has dev- prefix for consistency with backend
+  const normalizedUid = uid.startsWith('dev-') ? uid : `dev-${uid}`
   return {
-    uid,
+    uid: normalizedUid,
     email,
     isAnonymous: !email,
-    getIdToken: async () => `dev-${uid}`,
+    getIdToken: async () => normalizedUid,
   }
 }
 
@@ -87,7 +89,7 @@ export async function signOut(): Promise<void> {
 
 export async function getIdToken(): Promise<string | null> {
   if (DEV_MODE) {
-    return mockUser ? `dev-${mockUser.uid}` : null
+    return mockUser ? mockUser.uid : null
   }
   const user = auth!.currentUser
   if (!user) return null

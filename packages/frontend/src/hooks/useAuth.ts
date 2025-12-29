@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
-  auth,
   signInWithGoogle,
   signInAnonymously,
   signOut,
@@ -28,8 +27,8 @@ export function useAuth(): AuthState & AuthActions {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
+    const unsubscribe = onAuthStateChanged((user) => {
+      setUser(user as User | null)
       setLoading(false)
     })
 

@@ -92,7 +92,8 @@ class ApiClient {
 
   async getActiveGame(): Promise<Game | null> {
     try {
-      return await this.request<Game>('/users/me/active-game')
+      const response = await this.request<{ activeGame: Game | null }>('/users/me/active-game')
+      return response.activeGame
     } catch (err) {
       const error = err as ApiError
       if (error.code === 'GAME_NOT_FOUND') return null

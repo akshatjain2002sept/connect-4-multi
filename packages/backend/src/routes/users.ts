@@ -169,8 +169,8 @@ router.get('/me/active-game', authMiddleware, async (req, res: Response, next) =
         status: { in: ['WAITING', 'ACTIVE'] }
       },
       include: {
-        player1: { select: { id: true, username: true, rating: true } },
-        player2: { select: { id: true, username: true, rating: true } }
+        player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
       }
     })
 
