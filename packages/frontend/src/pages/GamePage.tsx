@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuthContext } from '../contexts/AuthContext'
 import { useGame } from '../hooks/useGame'
 import { GameBoard } from '../components/GameBoard'
 import { ClaimWinButton } from '../components/ClaimWinButton'
 import { GameOverModal } from '../components/GameOverModal'
+import { MatchLayout, MatchHeader } from '../components/game'
+import { colors } from '../styles/gameTokens'
 
 export function GamePage() {
   const { publicId } = useParams<{ publicId: string }>()
@@ -25,6 +27,7 @@ export function GamePage() {
     requestRematch,
     isOpponentAbandoned,
     getPlayerInfo,
+    isInMoveCooldown,
   } = useGame({
     publicId: publicId || '',
     onGameUpdate: (game) => {
@@ -89,35 +92,41 @@ export function GamePage() {
     return { row: lastMove.row, column: lastMove.column }
   }
 
+  // Loading and error states
   if (!publicId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center">
-        <div className="text-white text-xl">Invalid game URL</div>
-      </div>
+      <MatchLayout>
+        <div className="p-8 text-center">
+          <p className="text-white text-lg">Invalid game URL</p>
+        </div>
+      </MatchLayout>
     )
   }
 
   if (loading && !game) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center">
-        <div className="text-white text-xl">Loading game...</div>
-      </div>
+      <MatchLayout>
+        <div className="p-8 text-center">
+          <div className="inline-block w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+          <p className="text-white/60">Loading game...</p>
+        </div>
+      </MatchLayout>
     )
   }
 
   if (error && !game) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="text-xl mb-4">Error loading game</div>
+      <MatchLayout>
+        <div className="p-8 text-center">
+          <p className="text-white text-lg mb-4">Error loading game</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition"
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition"
           >
             Back to Lobby
           </button>
         </div>
-      </div>
+      </MatchLayout>
     )
   }
 
@@ -126,68 +135,46 @@ export function GamePage() {
   // Waiting for opponent
   if (game.status === 'WAITING') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-          <div className="animate-pulse mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-              <svg
-                className="w-8 h-8 text-blue-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+      <MatchLayout>
+        <div className="p-6 sm:p-8 text-center">
+          <div className="mb-6">
+            <div className="inline-block w-12 h-12 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Waiting for Opponent</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            Waiting for Opponent
+          </h2>
           {game.code && (
-            <div className="bg-gray-100 rounded-xl p-4 mb-6">
-              <div className="text-sm text-gray-500 mb-1">Share this code</div>
-              <div className="text-3xl font-mono font-bold text-blue-600 tracking-wider">
+            <div className="mt-4 p-4 rounded-lg" style={{ background: colors.bg.cardLight }}>
+              <div className="text-xs text-white/50 mb-1">Share this code</div>
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-blue-400 tracking-widest">
                 {game.code}
               </div>
             </div>
           )}
           <button
             onClick={() => navigate('/')}
-            className="w-full py-3 px-4 rounded-xl font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+            className="mt-6 w-full py-3 px-4 rounded-lg font-semibold bg-white/5 hover:bg-white/10 text-white/80 transition"
           >
             Cancel
           </button>
         </div>
-      </div>
+      </MatchLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 py-4 sm:py-8 px-2 sm:px-4">
-      <div className="container mx-auto max-w-lg">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4 sm:mb-6 text-white px-1">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 flex-shrink-0" />
-            <span className="font-medium text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">
-              {game.player1?.username || 'Player 1'}
-              {playerInfo?.playerNumber === 1 && ' (You)'}
-            </span>
-          </div>
-          <div className="text-xs sm:text-sm opacity-75 flex-shrink-0 px-2">vs</div>
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span className="font-medium text-sm sm:text-base truncate max-w-[80px] sm:max-w-none text-right">
-              {game.player2?.username || 'Player 2'}
-              {playerInfo?.playerNumber === 2 && ' (You)'}
-            </span>
-            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-yellow-400 flex-shrink-0" />
-          </div>
-        </div>
+    <MatchLayout>
+      {/* Match Header - directly above board */}
+      <MatchHeader
+        player1={game.player1}
+        player2={game.player2}
+        currentTurn={game.currentTurn}
+        myPlayerNumber={playerInfo?.playerNumber || null}
+        gameStatus={game.status}
+      />
 
-        {/* Game Board */}
+      {/* Game Board */}
+      <div className="p-3 sm:p-4">
         <GameBoard
           board={game.board}
           currentTurn={game.currentTurn}
@@ -197,10 +184,34 @@ export function GamePage() {
           disabled={moveLoading || game.status !== 'ACTIVE'}
           lastMove={getLastMove()}
         />
+      </div>
+
+      {/* Status bar - NEUTRAL COLORS ONLY */}
+      <div
+        className="px-4 py-3 text-center border-t"
+        style={{
+          borderColor: 'rgba(255, 255, 255, 0.05)',
+          background: colors.bg.cardLight,
+        }}
+      >
+        {/* Turn status - NO GREEN, use neutral grays with weight for emphasis */}
+        {game.status === 'ACTIVE' && (
+          <p
+            className="text-sm"
+            style={{
+              color: playerInfo?.isMyTurn ? colors.text.secondary : colors.text.subtle,
+              fontWeight: playerInfo?.isMyTurn ? 600 : 400,
+            }}
+          >
+            {playerInfo?.isMyTurn
+              ? "Your turn"
+              : `Waiting for ${game.currentTurn === 1 ? game.player1?.username : game.player2?.username}...`}
+          </p>
+        )}
 
         {/* Claim Win Button */}
         {isOpponentAbandoned() && user && (
-          <div className="mt-6 flex justify-center">
+          <div className="mt-3">
             <ClaimWinButton
               game={game}
               myUserId={user.uid}
@@ -210,9 +221,17 @@ export function GamePage() {
           </div>
         )}
 
-        {/* Error Display */}
-        {error && (
-          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl text-center">
+        {/* Error Display - using chip red for errors (allowed color) */}
+        {/* Hide errors during move operations and brief cooldown to prevent transient flash */}
+        {error && !moveLoading && !isInMoveCooldown() && (
+          <div
+            className="mt-3 p-3 rounded-lg text-sm"
+            style={{
+              background: `${colors.chip.red.primary}15`,
+              border: `1px solid ${colors.chip.red.primary}30`,
+              color: colors.chip.red.light,
+            }}
+          >
             {error.code || 'An error occurred'}
           </div>
         )}
@@ -228,6 +247,6 @@ export function GamePage() {
           rematchStatus={rematchStatus}
         />
       )}
-    </div>
+    </MatchLayout>
   )
 }

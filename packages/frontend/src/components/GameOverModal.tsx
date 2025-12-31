@@ -65,10 +65,11 @@ export function GameOverModal({
 
   const { title, subtitle, color } = getResultText()
   const ratingChange = getRatingChange()
-  const rematchRequested = game.rematchRequestedBy !== null
-  const iRequestedRematch = game.rematchRequestedBy === myPlayerNumber
+  // Use rematchStatus prop for "I requested" state (immediate feedback)
+  // Use game.rematchRequestedBy for "opponent requested" state (from polling)
+  const iRequestedRematch = rematchStatus === 'requested' || game.rematchRequestedBy === myPlayerNumber
   const opponentRequestedRematch =
-    rematchRequested && game.rematchRequestedBy !== myPlayerNumber
+    game.rematchRequestedBy !== null && game.rematchRequestedBy !== myPlayerNumber
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
@@ -114,18 +115,18 @@ export function GameOverModal({
                     opponentRequestedRematch
                       ? 'bg-green-500 hover:bg-green-600 text-white'
                       : iRequestedRematch
-                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                       : 'bg-blue-500 hover:bg-blue-600 text-white'
                   }
                   disabled:opacity-50
                 `}
               >
                 {rematchStatus === 'loading'
-                  ? 'Processing...'
+                  ? 'Sending...'
                   : opponentRequestedRematch
                   ? 'Accept Rematch'
                   : iRequestedRematch
-                  ? 'Waiting for opponent...'
+                  ? 'Request Sent - Waiting for opponent'
                   : 'Request Rematch'}
               </button>
 

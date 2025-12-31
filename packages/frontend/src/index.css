@@ -9,7 +9,11 @@
 }
 
 @layer utilities {
-  /* Animations for "Digital Plastic" aesthetic */
+  /* ==========================================================================
+     ANIMATIONS - Connect 4 Premium UI
+     ========================================================================== */
+
+  /* General fade/scale in */
   .animate-in {
     animation: animate-in 0.2s ease-out;
   }
@@ -29,33 +33,76 @@
     --tw-enter-scale: 0.95;
   }
 
-  /* Piece drop animation */
-  .animate-drop {
-    animation: drop 0.3s ease-out;
+  /* --------------------------------------------------------------------------
+     Chip Drop Animation - Fast and snappy, subtle settle
+     -------------------------------------------------------------------------- */
+  .animate-chip-drop {
+    animation: chip-drop 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  @keyframes drop {
-    from {
+  @keyframes chip-drop {
+    0% {
       transform: translateY(-100px);
       opacity: 0;
     }
-    to {
+    60% {
       transform: translateY(0);
       opacity: 1;
     }
+    75% {
+      transform: translateY(-4px);
+    }
+    90% {
+      transform: translateY(1px);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 
-  /* Winning piece glow */
-  .animate-win-glow {
-    animation: win-glow 1s ease-in-out infinite;
+  /* Legacy drop animation (for compatibility) */
+  .animate-drop {
+    animation: chip-drop 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  @keyframes win-glow {
+  /* --------------------------------------------------------------------------
+     Winner Pulse - Subtle glow pulse for winning chips
+     -------------------------------------------------------------------------- */
+  .animate-winner-pulse {
+    animation: winner-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes winner-pulse {
     0%, 100% {
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4),
+                  0 0 20px rgba(255, 255, 255, 0.2);
     }
     50% {
-      box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2),
+                  0 0 30px rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  /* Legacy glow (for compatibility) */
+  .animate-win-glow {
+    animation: winner-pulse 1.5s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: winner-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* --------------------------------------------------------------------------
+     Subtle ping for active turn indicator
+     -------------------------------------------------------------------------- */
+  @keyframes subtle-ping {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0;
     }
   }
 }

@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { api, Game, ApiError } from '../lib/api'
 import { usePolling } from './usePolling'
 import { useAuthContext } from '../contexts/AuthContext'
 
 const POLL_INTERVAL = 2000 // 2 seconds as per spec
 const ABANDON_THRESHOLD_MS = 30 * 1000 // 30 seconds
+const MOVE_COOLDOWN_MS = 500 // Brief cooldown after move to prevent error flash
 
 interface UseGameOptions {
   publicId: string
@@ -17,6 +18,7 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<ApiError | null>(null)
   const [moveLoading, setMoveLoading] = useState(false)
+  const lastMoveTimeRef = useRef<number>(0)
 
   const fetchGame = useCallback(async () => {
     return api.getGameByPublicId(publicId)
@@ -32,15 +34,24 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     [onGameUpdate]
   )
 
-  const handleError = useCallback((err: Error) => {
-    setError(err as unknown as ApiError)
+  // Polling errors are silent - only show errors from explicit user actions
+  // Polling will retry on next interval anyway
+  const handlePollingError = useCallback((_err: Error) => {
+    // Don't set error state for polling failures
+    // Just ensure loading is false so UI doesn't get stuck
     setLoading(false)
   }, [])
 
+  // Continue polling for:
+  // 1. Active/waiting games (normal gameplay)
+  // 2. Completed/abandoned games that don't have a rematch yet (for rematch detection)
+  // Stop polling only when: no publicId, during move, or rematch already created
+  const shouldPoll = !!publicId && !moveLoading && !game?.rematchGameId
+
   const { refresh } = usePolling(fetchGame, handleGameData, {
-    enabled: !!publicId && game?.status !== 'COMPLETED' && game?.status !== 'ABANDONED',
+    enabled: shouldPoll,
     interval: POLL_INTERVAL,
-    onError: handleError,
+    onError: handlePollingError,
   })
 
   const makeMove = useCallback(
@@ -53,6 +64,8 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
       try {
         const result = await api.makeMove(game.id, column)
         setGame(result.game)
+        setError(null) // Explicitly clear error after successful move
+        lastMoveTimeRef.current = Date.now() // Track successful move time
         return result
       } catch (err) {
         const apiError = err as ApiError
@@ -88,12 +101,15 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     if (!game) return
 
     try {
-      return await api.requestRematch(game.id)
+      const result = await api.requestRematch(game.id)
+      // Refresh game state to get updated rematchRequestedBy
+      refresh()
+      return result
     } catch (err) {
       setError(err as ApiError)
       throw err
     }
-  }, [game])
+  }, [game, refresh])
 
   // Determine if opponent has abandoned
   const isOpponentAbandoned = useCallback(() => {
@@ -132,6 +148,12 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     }
   }, [game, user])
 
+  // Check if we're in the brief cooldown period after a successful move
+  // During this period, transient errors should not be shown
+  const isInMoveCooldown = useCallback(() => {
+    return Date.now() - lastMoveTimeRef.current < MOVE_COOLDOWN_MS
+  }, [])
+
   return {
     game,
     loading,
@@ -143,5 +165,6 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     refresh,
     isOpponentAbandoned,
     getPlayerInfo,
+    isInMoveCooldown,
   }
 }

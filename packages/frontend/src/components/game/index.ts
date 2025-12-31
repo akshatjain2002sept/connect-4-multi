@@ -1,0 +1,5 @@
+export { Chip } from './Chip'
+export { CellHole } from './CellHole'
+export { BoardFrame } from './BoardFrame'
+export { MatchHeader } from './MatchHeader'
+export { MatchLayout } from './MatchLayout'
