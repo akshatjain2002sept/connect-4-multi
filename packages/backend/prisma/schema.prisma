@@ -60,7 +60,9 @@ model Game {
 
   // Rematch
   rematchRequestedBy Int?
-  rematchGameId      String?
+  rematchGameId      String?  @unique
+  rematchGame        Game?    @relation("Rematch", fields: [rematchGameId], references: [id])
+  rematchedFrom      Game?    @relation("Rematch")
 
   // Heartbeat / abandonment
   player1LastSeen DateTime?
@@ -96,4 +98,5 @@ enum EndReason {
   CONNECT4
   BOARD_FULL
   ABANDONED
+  RESIGNED
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContext'
 import { api, User } from '../lib/api'
 import { MatchmakingModal } from '../components/MatchmakingModal'
@@ -8,6 +8,7 @@ import { PreviewBoard } from '../components/PreviewBoard'
 export function HomePage() {
   const { user, signOut, getIdToken } = useAuthContext()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [profile, setProfile] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showMatchmaking, setShowMatchmaking] = useState(false)
@@ -17,6 +18,7 @@ export function HomePage() {
   const [joinError, setJoinError] = useState<string | null>(null)
   const [creatingGame, setCreatingGame] = useState(false)
   const [joiningGame, setJoiningGame] = useState(false)
+  const [activeGamePublicId, setActiveGamePublicId] = useState<string | null>(null)
 
   // Fetch or create user profile
   useEffect(() => {
@@ -36,9 +38,11 @@ export function HomePage() {
           setProfile(newProfile)
         }
 
+        // Check for active game but don't auto-redirect
+        // Show banner instead so user can choose
         const activeGame = await api.getActiveGame()
         if (activeGame) {
-          navigate(`/game/${activeGame.publicId}`)
+          setActiveGamePublicId(activeGame.publicId)
         }
       } catch (err) {
         console.error('Failed to initialize profile:', err)
@@ -48,7 +52,7 @@ export function HomePage() {
     }
 
     initProfile()
-  }, [user, getIdToken, navigate])
+  }, [user, getIdToken])
 
   const handleCreatePrivateGame = useCallback(async () => {
     setCreatingGame(true)
@@ -154,6 +158,24 @@ export function HomePage() {
           </button>
         </div>
       </header>
+
+      {/* Active Game Banner */}
+      {activeGamePublicId && (
+        <div className="px-4 sm:px-6">
+          <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-white/90 text-sm font-medium">You have an active game</span>
+            </div>
+            <button
+              onClick={() => navigate(`/game/${activeGamePublicId}`)}
+              className="bg-white text-blue-600 font-semibold px-4 py-2 rounded-lg text-sm hover:bg-white/90 transition-colors"
+            >
+              Resume
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content - Board + CTAs */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-6 min-h-0">

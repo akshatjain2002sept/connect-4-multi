@@ -46,7 +46,7 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
   // 1. Active/waiting games (normal gameplay)
   // 2. Completed/abandoned games that don't have a rematch yet (for rematch detection)
   // Stop polling only when: no publicId, during move, or rematch already created
-  const shouldPoll = !!publicId && !moveLoading && !game?.rematchGameId
+  const shouldPoll = !!publicId && !moveLoading && !game?.rematchPublicId
 
   const { refresh } = usePolling(fetchGame, handleGameData, {
     enabled: shouldPoll,
@@ -97,13 +97,29 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     }
   }, [game])
 
+  const resign = useCallback(async () => {
+    if (!game) return
+
+    try {
+      const result = await api.resign(game.id)
+      setGame(result.game)
+      return result
+    } catch (err) {
+      setError(err as ApiError)
+      throw err
+    }
+  }, [game])
+
   const requestRematch = useCallback(async () => {
     if (!game) return
 
     try {
       const result = await api.requestRematch(game.id)
-      // Refresh game state to get updated rematchRequestedBy
-      refresh()
+      // Only refresh if request is pending (not accepted)
+      // When accepted, caller will navigate to new game
+      if (result.status === 'requested') {
+        refresh()
+      }
       return result
     } catch (err) {
       setError(err as ApiError)
@@ -161,6 +177,7 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
     moveLoading,
     makeMove,
     claimAbandoned,
+    resign,
     requestRematch,
     refresh,
     isOpponentAbandoned,

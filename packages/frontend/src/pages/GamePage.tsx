@@ -13,6 +13,8 @@ export function GamePage() {
   const navigate = useNavigate()
   const { user } = useAuthContext()
   const [showGameOver, setShowGameOver] = useState(false)
+  const [showResignConfirm, setShowResignConfirm] = useState(false)
+  const [resignLoading, setResignLoading] = useState(false)
   const [rematchStatus, setRematchStatus] = useState<'none' | 'requested' | 'pending' | 'loading'>(
     'none'
   )
@@ -24,6 +26,7 @@ export function GamePage() {
     moveLoading,
     makeMove,
     claimAbandoned,
+    resign,
     requestRematch,
     isOpponentAbandoned,
     getPlayerInfo,
@@ -31,11 +34,13 @@ export function GamePage() {
   } = useGame({
     publicId: publicId || '',
     onGameUpdate: (game) => {
+      // If rematch is ready, navigate immediately (before showing game over)
+      if (game.rematchPublicId) {
+        navigate(`/game/${game.rematchPublicId}`, { replace: true })
+        return
+      }
       if (game.status === 'COMPLETED' || game.status === 'ABANDONED') {
         setShowGameOver(true)
-      }
-      if (game.rematchPublicId) {
-        navigate(`/game/${game.rematchPublicId}`)
       }
       if (game.rematchRequestedBy) {
         const playerInfo = getPlayerInfo()
@@ -71,11 +76,12 @@ export function GamePage() {
     setRematchStatus('loading')
     try {
       const result = await requestRematch()
-      if (result?.status === 'accepted') {
-        navigate(`/game/${result.newPublicId}`)
-      } else {
-        setRematchStatus('requested')
+      if (result?.status === 'accepted' && result.newPublicId) {
+        // Navigate to new game, replacing current entry to prevent back navigation
+        navigate(`/game/${result.newPublicId}`, { replace: true })
+        return
       }
+      setRematchStatus('requested')
     } catch {
       setRematchStatus('none')
     }
@@ -84,6 +90,18 @@ export function GamePage() {
   const handleBackToLobby = useCallback(() => {
     navigate('/')
   }, [navigate])
+
+  const handleResign = useCallback(async () => {
+    setResignLoading(true)
+    try {
+      await resign()
+      setShowResignConfirm(false)
+    } catch {
+      // Error already handled
+    } finally {
+      setResignLoading(false)
+    }
+  }, [resign])
 
   // Get last move for highlighting
   const getLastMove = () => {
@@ -167,6 +185,32 @@ export function GamePage() {
 
   return (
     <MatchLayout>
+      {/* Action bar - Lobby and Resign buttons */}
+      <div
+        className="flex items-center justify-between px-3 py-2"
+        style={{ background: colors.bg.card }}
+      >
+        <button
+          onClick={handleBackToLobby}
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs transition hover:bg-white/10"
+          style={{ color: colors.text.muted }}
+        >
+          <span>←</span>
+          <span>Lobby</span>
+        </button>
+
+        {/* Resign button - only show during active game when user is a player */}
+        {game.status === 'ACTIVE' && playerInfo && (
+          <button
+            onClick={() => setShowResignConfirm(true)}
+            className="px-2 py-1 rounded text-xs transition hover:bg-white/10"
+            style={{ color: colors.text.muted }}
+          >
+            Resign
+          </button>
+        )}
+      </div>
+
       {/* Match Header - directly above board */}
       <MatchHeader
         player1={game.player1}
@@ -249,6 +293,51 @@ export function GamePage() {
           onBackToLobby={handleBackToLobby}
           rematchStatus={rematchStatus}
         />
+      )}
+
+      {/* Resign Confirmation Dialog */}
+      {showResignConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div
+            className="w-full max-w-sm rounded-xl p-6"
+            style={{ background: colors.bg.card }}
+          >
+            <h3
+              className="text-lg font-semibold mb-2"
+              style={{ color: colors.text.primary }}
+            >
+              Resign Game?
+            </h3>
+            <p
+              className="text-sm mb-6"
+              style={{ color: colors.text.muted }}
+            >
+              You will forfeit this game and your opponent will win. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResignConfirm(false)}
+                disabled={resignLoading}
+                className="flex-1 py-2 px-4 rounded-lg font-medium transition bg-white/10 hover:bg-white/20"
+                style={{ color: colors.text.secondary }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResign}
+                disabled={resignLoading}
+                className="flex-1 py-2 px-4 rounded-lg font-medium transition"
+                style={{
+                  background: colors.chip.red.primary,
+                  color: colors.text.primary,
+                  opacity: resignLoading ? 0.7 : 1,
+                }}
+              >
+                {resignLoading ? 'Resigning...' : 'Resign'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </MatchLayout>
   )

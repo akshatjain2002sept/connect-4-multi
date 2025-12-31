@@ -40,6 +40,7 @@ export interface Game {
   player2LastSeen: string | null
   rematchRequestedBy: 1 | 2 | null
   rematchGameId: string | null
+  rematchPublicId: string | null
   createdAt: string
   updatedAt: string
   completedAt: string | null
@@ -143,6 +144,12 @@ class ApiClient {
 
   async claimAbandoned(gameId: string): Promise<{ game: Game }> {
     return this.request<{ game: Game }>(`/games/${gameId}/claim-abandoned`, {
+      method: 'POST',
+    })
+  }
+
+  async resign(gameId: string): Promise<{ game: Game }> {
+    return this.request<{ game: Game }>(`/games/${gameId}/resign`, {
       method: 'POST',
     })
   }

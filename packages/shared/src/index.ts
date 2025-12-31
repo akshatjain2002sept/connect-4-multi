@@ -7,7 +7,7 @@ export type GameStatus = 'WAITING' | 'ACTIVE' | 'COMPLETED' | 'ABANDONED'
 export type GameResult = 'P1_WIN' | 'P2_WIN' | 'DRAW'
 
 // End Reason
-export type EndReason = 'CONNECT4' | 'BOARD_FULL' | 'ABANDONED'
+export type EndReason = 'CONNECT4' | 'BOARD_FULL' | 'ABANDONED' | 'RESIGNED'
 
 // Move interface
 export interface Move {

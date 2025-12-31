@@ -52,6 +52,8 @@ function formatGameResponse(game: any) {
     player2LastSeen: game.player2LastSeen?.toISOString() ?? null,
     rematchRequestedBy: game.rematchRequestedBy,
     rematchGameId: game.rematchGameId,
+    // Include rematch game's public ID for navigation
+    rematchPublicId: game.rematchGame?.publicId ?? null,
     createdAt: game.createdAt.toISOString(),
     updatedAt: game.updatedAt.toISOString(),
     completedAt: game.completedAt?.toISOString() ?? null
@@ -205,7 +207,8 @@ router.get('/by-public/:publicId', authMiddleware, async (req, res: Response, ne
       where: { publicId },
       include: {
         player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
-        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        rematchGame: { select: { publicId: true } }
       }
     })
 
@@ -244,7 +247,8 @@ router.get('/:id', authMiddleware, async (req, res: Response, next) => {
       where: { id },
       include: {
         player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
-        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
+        player2: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+        rematchGame: { select: { publicId: true } }
       }
     })
 
@@ -687,6 +691,117 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
         game: formatGameResponse(newGame)
       })
     }
+  } catch (error) {
+    next(error)
+  }
+})
+
+/**
+ * POST /api/games/:id/resign
+ * Resign from a game (forfeit)
+ */
+router.post('/:id/resign', authMiddleware, async (req, res: Response, next) => {
+  try {
+    const { uid } = (req as AuthenticatedRequest).user
+    const { id: gameId } = req.params
+
+    const user = await prisma.user.findUnique({ where: { firebaseUid: uid } })
+    if (!user) throw new ApiError('USER_NOT_FOUND')
+
+    const result = await prisma.$transaction(async (tx) => {
+      const game = await tx.game.findUnique({ where: { id: gameId } })
+
+      if (!game) throw new ApiError('GAME_NOT_FOUND')
+      if (game.status !== 'ACTIVE') throw new ApiError('GAME_NOT_ACTIVE')
+      if (!game.player2Id) throw new ApiError('GAME_NOT_STARTED')
+
+      const isPlayer1 = user.id === game.player1Id
+      const isPlayer2 = user.id === game.player2Id
+      if (!isPlayer1 && !isPlayer2) throw new ApiError('NOT_IN_GAME')
+
+      // Assert snapshots
+      if (game.p1RatingBefore === null || game.p2RatingBefore === null) {
+        throw new Error('FATAL: Rating snapshots missing')
+      }
+
+      // Resigning player loses, opponent wins
+      const gameResult: GameResult = isPlayer1 ? 'P2_WIN' : 'P1_WIN'
+      const winnerId = isPlayer1 ? game.player2Id : game.player1Id
+
+      // Calculate ELO changes
+      let p1Delta: number, p2Delta: number
+      if (isPlayer1) {
+        // Player 1 resigned, Player 2 wins
+        const deltas = calculateEloChange(game.p2RatingBefore, game.p1RatingBefore)
+        p1Delta = deltas.loserDelta
+        p2Delta = deltas.winnerDelta
+      } else {
+        // Player 2 resigned, Player 1 wins
+        const deltas = calculateEloChange(game.p1RatingBefore, game.p2RatingBefore)
+        p1Delta = deltas.winnerDelta
+        p2Delta = deltas.loserDelta
+      }
+
+      // Atomic finalize
+      const updateResult = await tx.game.updateMany({
+        where: {
+          id: gameId,
+          status: 'ACTIVE',
+          ratingAppliedAt: null
+        },
+        data: {
+          status: 'COMPLETED',
+          result: gameResult,
+          endedReason: 'RESIGNED',
+          winnerId,
+          p1RatingDelta: p1Delta,
+          p2RatingDelta: p2Delta,
+          ratingAppliedAt: new Date(),
+          completedAt: new Date()
+        }
+      })
+
+      if (updateResult.count !== 1) {
+        // Already finalized - return current state
+        const currentGame = await tx.game.findUnique({
+          where: { id: gameId },
+          include: {
+            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
+          }
+        })
+        return currentGame!
+      }
+
+      // Update user ratings
+      await tx.user.update({
+        where: { id: game.player1Id },
+        data: {
+          rating: { increment: p1Delta },
+          ...(gameResult === 'P1_WIN' ? { wins: { increment: 1 } } : { losses: { increment: 1 } })
+        }
+      })
+
+      await tx.user.update({
+        where: { id: game.player2Id! },
+        data: {
+          rating: { increment: p2Delta },
+          ...(gameResult === 'P2_WIN' ? { wins: { increment: 1 } } : { losses: { increment: 1 } })
+        }
+      })
+
+      const finalGame = await tx.game.findUnique({
+        where: { id: gameId },
+        include: {
+          player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
+          player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
+        }
+      })
+
+      return finalGame!
+    })
+
+    res.json({ game: formatGameResponse(result) })
   } catch (error) {
     next(error)
   }
