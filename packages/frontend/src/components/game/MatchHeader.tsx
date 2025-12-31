@@ -28,8 +28,8 @@ export function MatchHeader({
     <div
       className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-t-xl"
       style={{
-        background: `linear-gradient(180deg, ${colors.bg.cardLight} 0%, ${colors.bg.card} 100%)`,
-        // No divider line - use spacing and opacity for separation
+        background: colors.bg.card,
+        // NO divider lines. Separation via space only.
       }}
     >
       {/* Player 1 (Red) */}
@@ -45,7 +45,7 @@ export function MatchHeader({
       <div className="flex flex-col items-center px-2">
         <span
           className="text-[10px] sm:text-xs font-medium tracking-wider"
-          style={{ color: colors.text.subtle }}
+          style={{ color: colors.text.muted }}
         >
           VS
         </span>
@@ -109,13 +109,12 @@ function PlayerBadge({ player, color, isActive, isMe, side }: PlayerBadgeProps) 
       {/* Player info - NO underlines, structure via spacing and brightness */}
       <div className={`flex flex-col min-w-0 ${isLeft ? 'items-start' : 'items-end'}`}>
         <div className="flex items-center gap-1.5">
-          {/* Scoreboard-style player name: clean, confident, readable */}
+          {/* LOCKED typography: weight 500, letter-spacing -0.01em, neutral grays */}
           <span
-            className={`text-sm sm:text-base truncate max-w-[80px] sm:max-w-[120px] transition-all duration-200 tracking-tight ${
-              isActive ? 'font-medium' : 'font-normal'
-            }`}
+            className="text-sm sm:text-base truncate max-w-[80px] sm:max-w-[120px] transition-all duration-200"
             style={{
-              color: isActive ? colors.text.primary : colors.text.muted,
+              color: isActive ? colors.text.primary : colors.text.secondary,
+              fontWeight: 500,
               letterSpacing: '-0.01em',
             }}
           >
@@ -123,10 +122,11 @@ function PlayerBadge({ player, color, isActive, isMe, side }: PlayerBadgeProps) 
           </span>
           {isMe && (
             <span
-              className="text-[10px] px-1.5 py-0.5 rounded font-medium"
+              className="text-[10px] px-1.5 py-0.5 rounded"
               style={{
                 background: `${chipColors.primary}15`,
                 color: colors.text.muted,
+                fontWeight: 400,
               }}
             >
               You
@@ -134,11 +134,11 @@ function PlayerBadge({ player, color, isActive, isMe, side }: PlayerBadgeProps) 
           )}
         </div>
 
-        {/* Rating - subdued, secondary to name */}
+        {/* Rating - LOCKED: weight 400, muted color */}
         {player?.rating && (
           <span
-            className="text-[10px] sm:text-xs mt-0.5 tracking-tight"
-            style={{ color: colors.text.subtle, letterSpacing: '0.02em' }}
+            className="text-[10px] sm:text-xs mt-0.5"
+            style={{ color: colors.text.muted, fontWeight: 400 }}
           >
             {player.rating}
           </span>

@@ -33,35 +33,23 @@ export function CellHole({
         ${canInteract ? 'cursor-pointer hover:scale-105 active:scale-95' : 'cursor-default'}
       `}
       style={{
-        // Layered cavity effect - navy blue derived from board, NOT black
-        // Radial gradient: lighter at top-left, darker at bottom-right
+        // LOCKED hole colors - derived from board, desaturated
+        // Radial gradient: lighter at top-left (30% 30%), darker at bottom-right
+        // No green/teal/cyan. Reads as depth, not color.
         background: `
           radial-gradient(
-            ellipse 120% 120% at 30% 25%,
-            ${colors.hole.highlight} 0%,
-            ${colors.hole.base} 40%,
-            ${colors.hole.deep} 100%
+            circle at 30% 30%,
+            ${colors.hole.top} 0%,
+            ${colors.hole.middle} 45%,
+            ${colors.hole.bottom} 70%
           )
         `,
-        // Soft inner shadow for depth, not harsh contrast
         boxShadow: shadows.hole,
       }}
       onClick={canInteract ? onClick : undefined}
       disabled={!canInteract}
     >
-      {/* Faint reflected light rim at top edge - very subtle */}
-      <div
-        className="absolute inset-0 rounded-full pointer-events-none"
-        style={{
-          background: `
-            linear-gradient(
-              180deg,
-              ${colors.hole.rim}15 0%,
-              transparent 20%
-            )
-          `,
-        }}
-      />
+      {/* No rim overlay - hole gradient provides all depth */}
 
       {/* Show preview chip on hover */}
       {isPreview && previewColor && !hasChip && (

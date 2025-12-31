@@ -8,25 +8,23 @@ interface BoardFrameProps {
 export function BoardFrame({ children }: BoardFrameProps) {
   return (
     <div className="relative">
-      {/* Main board frame */}
+      {/* Main board frame - LOCKED board colors */}
       <div
         className="relative rounded-xl sm:rounded-2xl overflow-hidden"
         style={{
-          // Outer bevel effect
+          // Frame edge with gradient to face
           background: `
             linear-gradient(
               180deg,
-              ${colors.board.accent} 0%,
-              ${colors.board.primary} 5%,
-              ${colors.board.secondary} 95%,
-              ${colors.board.frameDark} 100%
+              ${colors.board.primary} 0%,
+              ${colors.board.secondary} 100%
             )
           `,
           boxShadow: shadows.board,
           padding: '3px',
         }}
       >
-        {/* Inner face */}
+        {/* Inner face - LOCKED: primary (top) to secondary (bottom) */}
         <div
           className="rounded-lg sm:rounded-xl p-2 sm:p-3"
           style={{
@@ -37,18 +35,17 @@ export function BoardFrame({ children }: BoardFrameProps) {
                 ${colors.board.secondary} 100%
               )
             `,
-            boxShadow: shadows.boardInset,
           }}
         >
           {children}
         </div>
       </div>
 
-      {/* Subtle bottom foot/base - NOT protruding above */}
+      {/* Subtle bottom foot/base */}
       <div
         className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[90%] h-2 rounded-b-lg"
         style={{
-          background: `linear-gradient(180deg, ${colors.board.frameDark} 0%, #0f172a 100%)`,
+          background: `linear-gradient(180deg, ${colors.board.frame} 0%, #1a2744 100%)`,
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
         }}
       />

@@ -34,8 +34,8 @@ export function GamePage() {
       if (game.status === 'COMPLETED' || game.status === 'ABANDONED') {
         setShowGameOver(true)
       }
-      if (game.rematchGameId) {
-        navigate(`/game/${game.rematchGameId}`)
+      if (game.rematchPublicId) {
+        navigate(`/game/${game.rematchPublicId}`)
       }
       if (game.rematchRequestedBy) {
         const playerInfo = getPlayerInfo()
@@ -144,9 +144,12 @@ export function GamePage() {
             Waiting for Opponent
           </h2>
           {game.code && (
-            <div className="mt-4 p-4 rounded-lg" style={{ background: colors.bg.cardLight }}>
-              <div className="text-xs text-white/50 mb-1">Share this code</div>
-              <div className="text-2xl sm:text-3xl font-mono font-bold text-blue-400 tracking-widest">
+            <div className="mt-4 p-4 rounded-lg" style={{ background: colors.bg.card }}>
+              <div className="text-xs mb-1" style={{ color: colors.text.muted }}>Share this code</div>
+              <div
+                className="text-2xl sm:text-3xl font-mono font-bold tracking-widest"
+                style={{ color: colors.board.primary }}
+              >
                 {game.code}
               </div>
             </div>
@@ -186,21 +189,21 @@ export function GamePage() {
         />
       </div>
 
-      {/* Status bar - NEUTRAL COLORS ONLY */}
+      {/* Status bar - NO DIVIDER LINES, separation via spacing only */}
       <div
-        className="px-4 py-3 text-center border-t"
+        className="px-4 py-3 text-center"
         style={{
-          borderColor: 'rgba(255, 255, 255, 0.05)',
-          background: colors.bg.cardLight,
+          background: colors.bg.card,
+          marginTop: '12px',
         }}
       >
-        {/* Turn status - NO GREEN, use neutral grays with weight for emphasis */}
+        {/* Turn status - LOCKED text colors */}
         {game.status === 'ACTIVE' && (
           <p
             className="text-sm"
             style={{
-              color: playerInfo?.isMyTurn ? colors.text.secondary : colors.text.subtle,
-              fontWeight: playerInfo?.isMyTurn ? 600 : 400,
+              color: playerInfo?.isMyTurn ? colors.text.primary : colors.text.muted,
+              fontWeight: 500,
             }}
           >
             {playerInfo?.isMyTurn

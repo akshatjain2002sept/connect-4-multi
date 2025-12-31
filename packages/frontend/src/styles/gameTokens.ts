@@ -18,58 +18,60 @@
 // =============================================================================
 
 export const colors = {
-  // Background - Warm neutral (calm, inviting, like ambient light)
-  // The board pops because it's colorful, not because everything else is dark
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HARD COLOR LOCK - Do not tune by eye. Use exact values only.
+  // RULE: If any element introduces a new hue (green, teal, purple), it is WRONG.
+  // Palette = slate neutrals + board blue + red/yellow chips ONLY.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Background - Soft tabletop neutral (NOT black, NOT blue/inky)
+  // Feels like ambient room light, lets board pop without drama
   bg: {
-    page: '#4a5568',         // Soft neutral gray - main page background
-    pageLight: '#5a6578',    // Slightly lighter for subtle gradient
-    card: '#3d4552',         // Card background - subtle contrast
-    cardLight: '#4a5568',    // Card header/footer areas
+    page: '#5F6876',         // Soft slate - main (gradient end)
+    pageLight: '#6B7482',    // Slightly lighter (gradient start)
+    card: '#3F4654',         // Card background
+    cardBorder: 'rgba(255,255,255,0.06)',  // Subtle separation only
   },
 
-  // Board (only saturated blue in UI)
+  // Board - Most saturated object in UI (LOCKED)
   board: {
-    primary: '#2563eb',      // Vibrant blue
-    secondary: '#1d4ed8',    // Darker blue for depth
-    accent: '#3b82f6',       // Lighter blue for highlights
-    frame: '#1e40af',        // Frame edge
-    frameDark: '#1e3a8a',    // Frame shadow
+    primary: '#3F6FE8',      // Face top
+    secondary: '#2F5FD8',    // Face bottom
+    frame: '#2A54C8',        // Frame edge
   },
 
-  // Chips (only saturated red/yellow in UI)
+  // Chips - LOCKED (shading only, no hue shift)
+  // Shadows → multiply with black, Highlights → add white, NEVER add green
   chip: {
     red: {
-      primary: '#dc2626',    // Core red
-      light: '#ef4444',      // Highlight
-      dark: '#991b1b',       // Shadow
-      rim: '#b91c1c',        // Edge ring
-      glow: 'rgba(239, 68, 68, 0.4)',  // For active state
+      primary: '#E23B34',    // Core red (LOCKED)
+      light: '#F25A54',      // Highlight (white added)
+      dark: '#B22E28',       // Shadow (black multiplied)
+      rim: '#C93530',        // Edge ring
+      glow: 'rgba(226, 59, 52, 0.4)',
     },
     yellow: {
-      primary: '#eab308',    // Core yellow
-      light: '#facc15',      // Highlight
-      dark: '#a16207',       // Shadow
-      rim: '#ca8a04',        // Edge ring
-      glow: 'rgba(250, 204, 21, 0.4)', // For active state
+      primary: '#F2C21A',    // Core yellow (LOCKED)
+      light: '#F5D04A',      // Highlight (white added)
+      dark: '#C29B15',       // Shadow (black multiplied)
+      rim: '#D9AD17',        // Edge ring
+      glow: 'rgba(242, 194, 26, 0.4)',
     },
   },
 
-  // Holes - derived from board blue, NOT black or green
-  // Should read as carved cavities - depth, not color
-  // No teal/cyan/green bias - pure desaturated board blue
+  // Holes - Derived from board, but DESATURATED (LOCKED)
+  // Reads as depth, NOT color. No green/teal/cyan. Never pure black.
   hole: {
-    base: '#1a3354',         // Dark navy (desaturated board blue)
-    deep: '#122440',         // Deeper shadow - pure dark blue
-    highlight: '#243d5c',    // Subtle top-left highlight
-    rim: '#2d4a6a',          // Faint reflected light rim
+    top: '#2B3F5A',          // Inner top (lighter)
+    middle: '#24364D',       // Inner middle
+    bottom: '#1E2C40',       // Inner bottom (darker)
   },
 
-  // Neutral Text Hierarchy (NO SEMANTIC COLORS)
+  // Text - Neutral light grays only (NO accent colors)
   text: {
-    primary: '#ffffff',      // Brightest - active/important
-    secondary: '#e2e8f0',    // Default readable text (slate-200)
-    muted: '#94a3b8',        // De-emphasized text (slate-400)
-    subtle: '#64748b',       // Very subtle/disabled (slate-500)
+    primary: '#F1F3F6',      // Active player name
+    secondary: '#C2C8D2',    // Inactive player name
+    muted: '#9AA3B2',        // ELO / subtle info
   },
 } as const
 
@@ -78,29 +80,24 @@ export const colors = {
 // =============================================================================
 
 export const shadows = {
-  // Card/Panel shadows - softer for lighter background
-  card: '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 4px 10px -5px rgba(0, 0, 0, 0.1)',
-  cardHover: '0 15px 35px -5px rgba(0, 0, 0, 0.25)',
+  // Card shadow (LOCKED)
+  card: '0 18px 40px rgba(0, 0, 0, 0.25)',
 
-  // Board shadow - softer, less harsh
+  // Board shadow
   board: '0 15px 30px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.15)',
-  boardInset: 'inset 0 2px 4px rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.15)',
 
-  // Hole shadows - soft depth, not harsh contrast
+  // Hole shadows - soft depth
   hole: 'inset 0 3px 6px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.2)',
-  holeRim: 'inset 0 -1px 1px rgba(255, 255, 255, 0.08)',
 
   // Chip shadows
   chipDrop: '0 2px 4px rgba(0, 0, 0, 0.25)',
   chipInset: 'inset 0 -3px 6px rgba(0, 0, 0, 0.2)',
 
-  // Glow effects (using CHIP colors, not semantic colors)
-  redGlow: '0 0 12px rgba(239, 68, 68, 0.5)',
-  yellowGlow: '0 0 12px rgba(250, 204, 21, 0.5)',
-
-  // Subtle active glow (lower opacity for understated effect)
-  redGlowSubtle: '0 0 8px rgba(239, 68, 68, 0.3)',
-  yellowGlowSubtle: '0 0 8px rgba(250, 204, 21, 0.3)',
+  // Glow effects (using LOCKED chip colors)
+  redGlow: '0 0 12px rgba(226, 59, 52, 0.5)',
+  yellowGlow: '0 0 12px rgba(242, 194, 26, 0.5)',
+  redGlowSubtle: '0 0 8px rgba(226, 59, 52, 0.3)',
+  yellowGlowSubtle: '0 0 8px rgba(242, 194, 26, 0.3)',
 } as const
 
 // =============================================================================
