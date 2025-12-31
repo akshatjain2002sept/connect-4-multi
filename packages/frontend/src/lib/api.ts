@@ -157,7 +157,7 @@ class ApiClient {
   async joinMatchmaking(): Promise<
     | { status: 'queued' }
     | { status: 'already_queued' }
-    | { status: 'has_active_game'; gameId: string }
+    | { status: 'has_active_game'; gameId: string; publicId: string }
     | { status: 'matched'; gameId: string; publicId: string }
   > {
     return this.request('/matchmaking/join', { method: 'POST' })

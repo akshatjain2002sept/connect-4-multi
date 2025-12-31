@@ -45,7 +45,7 @@ export function MatchmakingModal({ onClose }: MatchmakingModalProps) {
           setStatus('queued')
           setQueuedAt(new Date())
         } else if (result.status === 'has_active_game') {
-          navigate(`/game/${result.gameId}`)
+          navigate(`/game/${result.publicId}`)
         }
       } catch (err) {
         setStatus('error')
