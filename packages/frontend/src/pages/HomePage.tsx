@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate, Link, useSearchParams } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContext'
 import { api, User } from '../lib/api'
 import { MatchmakingModal } from '../components/MatchmakingModal'
@@ -8,7 +8,6 @@ import { PreviewBoard } from '../components/PreviewBoard'
 export function HomePage() {
   const { user, signOut, getIdToken } = useAuthContext()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const [profile, setProfile] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showMatchmaking, setShowMatchmaking] = useState(false)
@@ -39,9 +38,10 @@ export function HomePage() {
         }
 
         // Check for active game but don't auto-redirect
-        // Show banner instead so user can choose
+        // Only show Resume button for ACTIVE games (gameplay in progress)
+        // Don't show for WAITING games - those can be abandoned
         const activeGame = await api.getActiveGame()
-        if (activeGame) {
+        if (activeGame && activeGame.status === 'ACTIVE') {
           setActiveGamePublicId(activeGame.publicId)
         }
       } catch (err) {
@@ -159,23 +159,6 @@ export function HomePage() {
         </div>
       </header>
 
-      {/* Active Game Banner */}
-      {activeGamePublicId && (
-        <div className="px-4 sm:px-6">
-          <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-white/90 text-sm font-medium">You have an active game</span>
-            </div>
-            <button
-              onClick={() => navigate(`/game/${activeGamePublicId}`)}
-              className="bg-white text-blue-600 font-semibold px-4 py-2 rounded-lg text-sm hover:bg-white/90 transition-colors"
-            >
-              Resume
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Main Content - Board + CTAs */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pb-6 min-h-0">
@@ -189,29 +172,40 @@ export function HomePage() {
           <PreviewBoard className="w-full" />
         </div>
 
-        {/* Action Button - Single Play Now CTA */}
+        {/* Action Button - Resume Game or Play Now */}
         <div className="w-full max-w-xs sm:max-w-sm">
-          <button
-            onClick={openPlayModal}
-            className="w-full bg-gradient-to-b from-white to-gray-100 text-blue-700 font-bold py-4 px-6 rounded-2xl hover:from-gray-50 hover:to-gray-150 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md flex items-center justify-center gap-2 border border-white/50"
-            style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)' }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Play Now
-          </button>
+          {activeGamePublicId ? (
+            <button
+              onClick={() => navigate(`/game/${activeGamePublicId}`)}
+              className="w-full bg-gradient-to-b from-green-400 to-green-500 text-white font-bold py-4 px-6 rounded-2xl hover:from-green-350 hover:to-green-450 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md flex items-center justify-center gap-2 border border-green-300/50"
+              style={{ boxShadow: '0 4px 14px rgba(34, 197, 94, 0.3), inset 0 1px 0 rgba(255,255,255,0.3)' }}
+            >
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+              Resume Game
+            </button>
+          ) : (
+            <button
+              onClick={openPlayModal}
+              className="w-full bg-gradient-to-b from-white to-gray-100 text-blue-700 font-bold py-4 px-6 rounded-2xl hover:from-gray-50 hover:to-gray-150 transition-all duration-150 text-lg shadow-lg hover:shadow-xl active:translate-y-0.5 active:shadow-md flex items-center justify-center gap-2 border border-white/50"
+              style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Play Now
+            </button>
+          )}
         </div>
 
         {/* Stats row - subtle, below buttons */}

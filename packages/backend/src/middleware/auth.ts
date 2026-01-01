@@ -46,11 +46,13 @@ export async function authMiddleware(
     // In dev mode, token format is "Bearer dev-{userId}" or just "Bearer {userId}"
     const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : 'dev-user-1'
     const uid = token.startsWith('dev-') ? token : `dev-${token}`
+    // Detect guest users by uid pattern (dev-guest-*)
+    const isGuest = uid.includes('guest')
 
     ;(req as AuthenticatedRequest).user = {
       uid,
-      email: `${uid}@dev.local`,
-      isAnonymous: false,
+      email: isGuest ? undefined : `${uid}@dev.local`,
+      isAnonymous: isGuest,
     }
     next()
     return

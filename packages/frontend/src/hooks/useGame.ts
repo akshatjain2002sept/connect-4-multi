@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { api, Game, ApiError } from '../lib/api'
 import { usePolling } from './usePolling'
 import { useAuthContext } from '../contexts/AuthContext'
@@ -19,6 +19,15 @@ export function useGame({ publicId, onGameUpdate }: UseGameOptions) {
   const [error, setError] = useState<ApiError | null>(null)
   const [moveLoading, setMoveLoading] = useState(false)
   const lastMoveTimeRef = useRef<number>(0)
+
+  // Reset state when publicId changes (e.g., navigating to rematch game)
+  // This prevents stale data from the previous game being displayed
+  useEffect(() => {
+    setGame(null)
+    setLoading(true)
+    setError(null)
+    setMoveLoading(false)
+  }, [publicId])
 
   const fetchGame = useCallback(async () => {
     return api.getGameByPublicId(publicId)

@@ -59,7 +59,17 @@ router.post('/join', authMiddleware, async (req, res: Response, next) => {
       // Already in a game?
       const activeGame = await getActiveGameForUser(prisma, user.id)
       if (activeGame) {
-        return { status: 'has_active_game' as const, gameId: activeGame.id, publicId: activeGame.publicId }
+        // If user has a WAITING game they created (no opponent yet), auto-cancel it
+        // This allows joining matchmaking without manually canceling the old game
+        if (activeGame.status === 'WAITING' && activeGame.player1Id === user.id && !activeGame.player2Id) {
+          await prisma.game.update({
+            where: { id: activeGame.id },
+            data: { status: 'ABANDONED' }
+          })
+        } else {
+          // User has an ACTIVE game or is player2 in a WAITING game
+          return { status: 'has_active_game' as const, gameId: activeGame.id, publicId: activeGame.publicId }
+        }
       }
 
       cleanupStaleQueueEntries()
@@ -126,11 +136,8 @@ router.post('/join', authMiddleware, async (req, res: Response, next) => {
       return { status: 'queued' as const }
     })
 
-    if (result.status === 'already_queued') {
-      res.status(409).json({ error: 'ALREADY_QUEUED', status: 'queued' })
-    } else {
-      res.json(result)
-    }
+    // Return 200 for already_queued since user is effectively queued (idempotent)
+    res.json(result)
   } catch (error) {
     next(error)
   }

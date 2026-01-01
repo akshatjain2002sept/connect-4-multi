@@ -73,7 +73,19 @@ router.post('/', authMiddleware, async (req, res: Response, next) => {
 
     // Check for active game
     const activeGame = await getActiveGameForUser(prisma, user.id)
-    if (activeGame) throw new ApiError('HAS_ACTIVE_GAME')
+    if (activeGame) {
+      // If user has a WAITING game they created (no opponent yet), auto-cancel it
+      // This allows creating a new game without manually canceling the old one
+      if (activeGame.status === 'WAITING' && activeGame.player1Id === user.id && !activeGame.player2Id) {
+        await prisma.game.update({
+          where: { id: activeGame.id },
+          data: { status: 'ABANDONED' }
+        })
+      } else {
+        // User has an ACTIVE game or is player2 in a WAITING game - can't create new
+        throw new ApiError('HAS_ACTIVE_GAME')
+      }
+    }
 
     // Generate unique game code with retry
     let game = null
@@ -129,7 +141,19 @@ router.post('/join/:code', authMiddleware, async (req, res: Response, next) => {
 
     // Check for active game
     const activeGame = await getActiveGameForUser(prisma, user.id)
-    if (activeGame) throw new ApiError('HAS_ACTIVE_GAME')
+    if (activeGame) {
+      // If user has a WAITING game they created (no opponent yet), auto-cancel it
+      // This allows joining a new game without manually canceling the old one
+      if (activeGame.status === 'WAITING' && activeGame.player1Id === user.id && !activeGame.player2Id) {
+        await prisma.game.update({
+          where: { id: activeGame.id },
+          data: { status: 'ABANDONED' }
+        })
+      } else {
+        // User has an ACTIVE game or is player2 in a WAITING game - can't join new
+        throw new ApiError('HAS_ACTIVE_GAME')
+      }
+    }
 
     const result = await prisma.$transaction(async (tx) => {
       const game = await tx.game.findUnique({
@@ -446,6 +470,36 @@ router.post('/:id/move', authMiddleware, async (req, res: Response, next) => {
       game: formatGameResponse(result.game),
       move: result.move
     })
+  } catch (error) {
+    next(error)
+  }
+})
+
+/**
+ * POST /api/games/:id/cancel
+ * Cancel a WAITING game (only creator can cancel, only before opponent joins)
+ */
+router.post('/:id/cancel', authMiddleware, async (req, res: Response, next) => {
+  try {
+    const { uid } = (req as AuthenticatedRequest).user
+    const { id: gameId } = req.params
+
+    const user = await prisma.user.findUnique({ where: { firebaseUid: uid } })
+    if (!user) throw new ApiError('USER_NOT_FOUND')
+
+    const game = await prisma.game.findUnique({ where: { id: gameId } })
+
+    if (!game) throw new ApiError('GAME_NOT_FOUND')
+    if (game.status !== 'WAITING') throw new ApiError('GAME_ALREADY_STARTED')
+    if (game.player1Id !== user.id) throw new ApiError('NOT_GAME_CREATOR')
+    if (game.player2Id !== null) throw new ApiError('OPPONENT_ALREADY_JOINED')
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: { status: 'ABANDONED' }
+    })
+
+    res.json({ success: true })
   } catch (error) {
     next(error)
   }

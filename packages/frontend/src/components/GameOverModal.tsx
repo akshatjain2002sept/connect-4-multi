@@ -100,7 +100,7 @@ export function GameOverModal({
         )}
 
         <div className="space-y-3">
-          {game.rematchGameId ? (
+          {game.rematchPublicId ? (
             <div className="text-center text-green-600 font-medium py-3">
               Rematch accepted! Redirecting...
             </div>

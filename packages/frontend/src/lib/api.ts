@@ -154,6 +154,12 @@ class ApiClient {
     })
   }
 
+  async cancelGame(gameId: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/games/${gameId}/cancel`, {
+      method: 'POST',
+    })
+  }
+
   async requestRematch(
     gameId: string
   ): Promise<{ status: 'requested' } | { status: 'accepted'; newGameId: string; newPublicId: string }> {
