@@ -194,55 +194,6 @@ router.get('/status', authMiddleware, async (req, res: Response, next) => {
       entry.lastHeartbeat = new Date()
       cleanupStaleQueueEntries()
 
-      // Try to match
-      let matchedUserId: string | null = null
-      let matchedEntry: QueueEntry | null = null
-
-      for (const [id, other] of matchmakingQueue) {
-        if (id !== user.id) {
-          matchedUserId = id
-          matchedEntry = other
-          break
-        }
-      }
-
-      if (matchedUserId && matchedEntry) {
-        matchmakingQueue.delete(user.id)
-        matchmakingQueue.delete(matchedUserId)
-
-        // Verify neither has an active game
-        const [myActive, theirActive] = await Promise.all([
-          getActiveGameForUser(prisma, user.id),
-          getActiveGameForUser(prisma, matchedUserId)
-        ])
-
-        if (myActive || theirActive) {
-          if (!myActive) matchmakingQueue.set(user.id, entry)
-          if (!theirActive) matchmakingQueue.set(matchedUserId, matchedEntry)
-          return { status: 'queued' as const, queuedAt: entry.joinedAt.toISOString() }
-        }
-
-        // Create game
-        const player1GoesFirst = Math.random() < 0.5
-        const [p1Data, p2Data] = await Promise.all([
-          prisma.user.findUnique({ where: { id: matchedUserId } }),
-          prisma.user.findUnique({ where: { id: user.id } })
-        ])
-
-        const game = await createGameWithPublicId(prisma, {
-          player1: { connect: { id: matchedUserId } },
-          player2: { connect: { id: user.id } },
-          status: 'ACTIVE',
-          currentTurn: player1GoesFirst ? 1 : 2,
-          p1RatingBefore: p1Data!.rating,
-          p2RatingBefore: p2Data!.rating,
-          player1LastSeen: new Date(),
-          player2LastSeen: new Date()
-        })
-
-        return { status: 'matched' as const, gameId: game.id, publicId: game.publicId }
-      }
-
       return { status: 'queued' as const, queuedAt: entry.joinedAt.toISOString() }
     })
 

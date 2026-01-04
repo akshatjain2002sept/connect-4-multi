@@ -238,8 +238,8 @@ router.get('/by-public/:publicId', authMiddleware, async (req, res: Response, ne
 
     if (!game) throw new ApiError('GAME_NOT_FOUND')
 
-    // Update heartbeat if user is a player in an active game
-    if (game.status === 'ACTIVE') {
+    // Update heartbeat for any active player in WAITING or ACTIVE games
+    if (game.status === 'WAITING' || game.status === 'ACTIVE') {
       if (game.player1Id === user.id) {
         await prisma.game.update({
           where: { id: game.id },
@@ -697,31 +697,11 @@ router.post('/:id/rematch', authMiddleware, async (req, res: Response, next) => 
         player2LastSeen: new Date()
       })
 
-      // CRITICAL: Optimistic lock on rematchGameId to prevent duplicates
-      const linkResult = await tx.game.updateMany({
-        where: {
-          id: gameId,
-          rematchGameId: null // Only if not already linked
-        },
-        data: {
-          rematchGameId: newGame.id
-        }
+      // Link rematch game atomically without race conditions
+      await tx.game.update({
+        where: { id: gameId },
+        data: { rematchGameId: newGame.id }
       })
-
-      if (linkResult.count !== 1) {
-        // Another transaction won - delete orphan and return existing rematch
-        await tx.game.delete({ where: { id: newGame.id } })
-
-        const updatedOriginal = await tx.game.findUnique({ where: { id: gameId } })
-        const existingRematch = await tx.game.findUnique({
-          where: { id: updatedOriginal!.rematchGameId! },
-          include: {
-            player1: { select: { id: true, firebaseUid: true, username: true, rating: true } },
-            player2: { select: { id: true, firebaseUid: true, username: true, rating: true } }
-          }
-        })
-        return { status: 'accepted', newGame: existingRematch! }
-      }
 
       const fullNewGame = await tx.game.findUnique({
         where: { id: newGame.id },
