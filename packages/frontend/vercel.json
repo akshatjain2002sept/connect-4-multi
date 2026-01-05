@@ -8,10 +8,12 @@
     {
       "source": "/api/:path*",
       "destination": "https://backend-production-c1ff.up.railway.app/api/:path*"
-    },
+    }
+  ],
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/.*",
+      "dest": "/index.html"
     }
   ],
   "headers": [
