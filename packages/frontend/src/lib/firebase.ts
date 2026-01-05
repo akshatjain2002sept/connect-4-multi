@@ -45,12 +45,12 @@ let googleProvider: GoogleAuthProvider | null = null
 
 if (!DEV_MODE) {
   const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    apiKey: "AIzaSyCh3YDYu39J7ZoHBrqszYSBNjGHqB7CxaU",
+    authDomain: "connect-4-multi.firebaseapp.com",
+    projectId: "connect-4-multi",
+    storageBucket: "connect-4-multi.firebasestorage.app",
+    messagingSenderId: "955330347096",
+    appId: "1:955330347096:web:7f59ba3148ec6df8a38a2d",
   }
 
   const app = initializeApp(firebaseConfig)

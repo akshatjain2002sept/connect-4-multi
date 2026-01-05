@@ -9,7 +9,7 @@ import type {
   ApiErrorCode,
 } from '../shared/index.js'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+const API_BASE_URL = '/api'
 
 // Extended User type with firebaseUid for auth matching
 export interface User extends SharedUser {

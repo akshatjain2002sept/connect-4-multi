@@ -23,6 +23,8 @@ export type ApiErrorCode =
   | 'MOVE_CONFLICT'
   | 'USERNAME_TAKEN'
   | 'INVALID_USERNAME'
+  | 'NOT_GAME_CREATOR'
+  | 'OPPONENT_ALREADY_JOINED'
 
 const ERROR_STATUS_CODES: Record<ApiErrorCode, number> = {
   UNAUTHORIZED: 401,
@@ -46,6 +48,8 @@ const ERROR_STATUS_CODES: Record<ApiErrorCode, number> = {
   MOVE_CONFLICT: 409,
   USERNAME_TAKEN: 409,
   INVALID_USERNAME: 400,
+  NOT_GAME_CREATOR: 403,
+  OPPONENT_ALREADY_JOINED: 409,
 }
 
 export class ApiError extends Error {

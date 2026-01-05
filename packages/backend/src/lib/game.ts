@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 import type { Game } from '@prisma/client'
-import { Move, BOARD_SIZE, ABANDON_THRESHOLD_MS } from '@connect4/shared'
+import { Move, BOARD_SIZE, ABANDON_THRESHOLD_MS } from '../shared/index.js'
 
 // Base32 characters (excluding I, O, 0, 1 to avoid confusion)
 const BASE32_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'

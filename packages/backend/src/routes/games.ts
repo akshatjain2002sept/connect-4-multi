@@ -15,7 +15,7 @@ import {
   calculateEloDraw,
   checkAbandonment
 } from '../lib/game.js'
-import { Move, GameResult, EndReason } from '@connect4/shared'
+import { Move, GameResult, EndReason } from '../shared/index.js'
 
 const router: ReturnType<typeof Router> = Router()
 
