@@ -6,17 +6,33 @@ const DEV_MODE = process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_
 
 // Initialize Firebase Admin (only once, skip in dev bypass mode)
 if (!DEV_MODE && !admin.apps.length) {
-  // In production, use GOOGLE_APPLICATION_CREDENTIALS env var
-  // For development, initialize with project config
   const projectId = process.env.FIREBASE_PROJECT_ID
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
 
-  if (projectId) {
-    admin.initializeApp({
-      projectId,
-    })
-  } else {
-    // Fallback: try default credentials
-    admin.initializeApp()
+  try {
+    if (serviceAccountJson) {
+      // Parse service account JSON from environment variable
+      const serviceAccount = JSON.parse(serviceAccountJson)
+
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: projectId || serviceAccount.project_id,
+      })
+      console.log('Firebase Admin initialized with service account credentials')
+    } else if (projectId) {
+      // Fallback: use project ID only (will try default credentials)
+      admin.initializeApp({
+        projectId,
+      })
+      console.log('Firebase Admin initialized with project ID only')
+    } else {
+      // Last resort: try default credentials
+      admin.initializeApp()
+      console.log('Firebase Admin initialized with default credentials')
+    }
+  } catch (error) {
+    console.error('Failed to initialize Firebase Admin:', error)
+    // Continue without Firebase Admin - auth will fail gracefully
   }
 }
 

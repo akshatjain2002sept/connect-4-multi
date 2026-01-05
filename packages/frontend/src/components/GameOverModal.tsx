@@ -1,5 +1,5 @@
 import { Game, User } from '../lib/api'
-import { GameResult } from '@connect4/shared'
+import { GameResult } from '../shared/index.js'
 
 interface GameOverModalProps {
   game: Game

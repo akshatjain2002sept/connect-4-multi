@@ -7,7 +7,7 @@ import type {
   User as SharedUser,
   Game as SharedGame,
   ApiErrorCode,
-} from '@connect4/shared'
+} from '../shared/index.js'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
