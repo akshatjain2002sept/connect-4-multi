@@ -6,33 +6,44 @@ const DEV_MODE = process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_
 
 // Initialize Firebase Admin (only once, skip in dev bypass mode)
 if (!DEV_MODE && !admin.apps.length) {
-  const projectId = process.env.FIREBASE_PROJECT_ID
-  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
-
   try {
-    if (serviceAccountJson) {
-      // Parse service account JSON from environment variable
-      const serviceAccount = JSON.parse(serviceAccountJson)
+    // Method 1: Use GOOGLE_APPLICATION_CREDENTIALS file path (standard)
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      admin.initializeApp({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+      })
+      console.log('Firebase Admin initialized with service account file')
+    }
+    // Method 2: Use individual environment variables (cleaner than JSON blob)
+    else if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+      const serviceAccount = {
+        type: 'service_account',
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      }
 
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: projectId || serviceAccount.project_id,
+        projectId: process.env.FIREBASE_PROJECT_ID,
       })
-      console.log('Firebase Admin initialized with service account credentials')
-    } else if (projectId) {
-      // Fallback: use project ID only (will try default credentials)
+      console.log('Firebase Admin initialized with individual environment variables')
+    }
+    // Method 3: Project ID only (will try default credentials)
+    else if (process.env.FIREBASE_PROJECT_ID) {
       admin.initializeApp({
-        projectId,
+        projectId: process.env.FIREBASE_PROJECT_ID,
       })
-      console.log('Firebase Admin initialized with project ID only')
-    } else {
-      // Last resort: try default credentials
+      console.log('Firebase Admin initialized with project ID only (using default credentials)')
+    }
+    // Method 4: Default credentials auto-discovery
+    else {
       admin.initializeApp()
       console.log('Firebase Admin initialized with default credentials')
     }
   } catch (error) {
     console.error('Failed to initialize Firebase Admin:', error)
-    // Continue without Firebase Admin - auth will fail gracefully
+    console.log('Auth will use fallback mode - tokens will be rejected')
   }
 }
 
